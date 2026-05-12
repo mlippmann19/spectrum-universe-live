@@ -486,10 +486,12 @@ Deno.serve(async (req: Request) => {
           updates.tql_ready = true;
         }
       }
-      if (Object.keys(updates).length) {
-        await supabase.from("deals").update(updates).eq("id", dealId);
-      }
-      console.log("Active deal exists for company — not creating duplicate.");
+      // Always surface in Web Inquiries — flag as new website lead so it
+      // appears in the /inquiries review queue regardless of prior lead_source.
+      updates.lead_source = "website";
+      updates.is_new_lead = true;
+      await supabase.from("deals").update(updates).eq("id", dealId);
+      console.log("Active deal exists for company — merged + flagged as website lead.");
     }
   }
 
