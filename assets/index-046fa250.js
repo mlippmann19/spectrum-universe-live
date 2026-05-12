@@ -727,7 +727,1011 @@ Research this company thoroughly and provide the full scoring report plus the Ex
     ]}):null,
     detailPanel
   ]});
-}function qce(){const[e,t]=C.useState(""),[r,a]=C.useState("all"),{data:i=[],isLoading:o,error:s}=Mt({queryKey:["erp-quotes"],queryFn:()=>Ct("quotes","select=*&order=created_at.desc"),staleTime:3e4}),l=i.reduce((h,y)=>h+(y.total??0),0),d=i.filter(h=>h.status==="won"||h.status==="invoiced").length,u=i.filter(h=>h.status==="draft").length,p=i.filter(h=>h.status==="sent").length,m=["all",...Array.from(new Set(i.map(h=>(h.division??"").toLowerCase()).filter(Boolean)))],g=i.filter(h=>{const y=e.toLowerCase(),v=(h.quote_number??"").toLowerCase().includes(y)||(h.title??"").toLowerCase().includes(y)||(h.contact_name??"").toLowerCase().includes(y)||(h.prepared_by??"").toLowerCase().includes(y),w=r==="all"||(h.division??"").toLowerCase()===r;return v&&w});return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[n.jsx("div",{className:"px-8 py-4 border-b border-border grid grid-cols-4 gap-4 shrink-0",children:[{label:"Total Value",value:v9(l),color:"text-primary",Icon:cf,raw:!0},{label:"Won / Invoiced",value:String(d),color:"text-emerald-400",Icon:Ed},{label:"Sent",value:String(p),color:"text-blue-400",Icon:ci},{label:"Drafts",value:String(u),color:"text-slate-400",Icon:Go}].map(({label:h,value:y,color:v,Icon:w})=>n.jsxs("div",{className:"bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3",children:[n.jsx(w,{className:`w-5 h-5 ${v} shrink-0`}),n.jsxs("div",{children:[n.jsx("p",{className:"text-[11px] text-muted-foreground/70 uppercase tracking-wide font-semibold",children:h}),n.jsx("p",{className:`text-xl font-bold ${v}`,children:y})]})]},h))}),n.jsxs("div",{className:"px-8 py-3 border-b border-border flex items-center gap-3 shrink-0",children:[n.jsxs("div",{className:"relative flex-1 max-w-xs",children:[n.jsx(wo,{className:"absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground"}),n.jsx(Sg,{className:"pl-8 h-8 text-sm",placeholder:"Search quote #, title, contact…",value:e,onChange:h=>t(h.target.value)})]}),n.jsx("div",{className:"flex gap-1.5",children:m.map(h=>n.jsx("button",{onClick:()=>a(h),className:`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${r===h?"bg-primary text-primary-foreground":"bg-muted text-muted-foreground hover:text-foreground"}`,children:h==="all"?"All Divisions":h},h))})]}),n.jsxs("div",{className:"flex-1 overflow-auto",children:[o&&n.jsx("div",{className:"flex items-center justify-center py-20 text-sm text-muted-foreground",children:"Loading quotes from Supabase…"}),s&&n.jsxs("div",{className:"flex items-center justify-center py-20 text-sm text-rose-400",children:["Error loading quotes — ",s.message]}),!o&&!s&&n.jsxs("table",{className:"w-full text-sm",children:[n.jsx("thead",{className:"sticky top-0 bg-background border-b border-border z-10",children:n.jsx("tr",{className:"text-left",children:["Quote #","Title","Division","Status","Contact","Prepared By","Total","Created"].map(h=>n.jsx("th",{className:"px-4 py-3 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide whitespace-nowrap",children:h},h))})}),n.jsx("tbody",{className:"divide-y divide-border",children:g.map(h=>{const y=Uce[h.status??"draft"]??{label:h.status??"—",color:"text-muted-foreground",bg:"bg-muted"};return n.jsxs("tr",{className:"hover:bg-muted/30 transition-colors",children:[n.jsx("td",{className:"px-4 py-3 font-mono text-xs font-medium text-foreground whitespace-nowrap",children:h.quote_number||"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate",children:h.title}),n.jsx("td",{className:"px-4 py-3",children:h.division?n.jsx(LN,{div:h.division}):n.jsx("span",{className:"text-muted-foreground/40 text-xs",children:"—"})}),n.jsx("td",{className:"px-4 py-3",children:n.jsx("span",{className:`px-2 py-0.5 rounded-full text-[11px] font-medium ${y.bg} ${y.color}`,children:y.label})}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:h.contact_name||"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:h.prepared_by||"—"}),n.jsx("td",{className:"px-4 py-3 font-medium text-foreground text-xs whitespace-nowrap",children:h.total!=null?v9(h.total):"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:og(h.created_at)})]},h.id)})})]}),!o&&!s&&g.length===0&&n.jsxs("div",{className:"flex flex-col items-center justify-center py-20 text-center",children:[n.jsx(ci,{className:"w-10 h-10 text-muted-foreground/30 mb-3"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:i.length===0?"No quotes found in Supabase":"No quotes match your filter"})]})]})]})}function Bce(){const[e,t]=C.useState("all"),{data:r=[],isLoading:a,error:i}=Mt({queryKey:["erp-pricing-rates"],queryFn:()=>Ct("pricing_rates","select=*&active=eq.true&order=division.asc,sort_order.asc"),staleTime:6e4}),o=["all",...Array.from(new Set(r.map(d=>d.division)))],s=e==="all"?r:r.filter(d=>d.division===e),l={};for(const d of s)l[d.division]||(l[d.division]={}),l[d.division][d.category]||(l[d.division][d.category]=[]),l[d.division][d.category].push(d);return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[n.jsxs("div",{className:"px-8 py-3 border-b border-border flex items-center gap-3 shrink-0",children:[n.jsx("span",{className:"text-xs text-muted-foreground font-medium",children:"Division:"}),n.jsx("div",{className:"flex gap-1.5",children:o.map(d=>n.jsx("button",{onClick:()=>t(d),className:`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${e===d?"bg-primary text-primary-foreground":"bg-muted text-muted-foreground hover:text-foreground"}`,children:d==="all"?"All Divisions":d},d))}),n.jsxs("span",{className:"ml-auto text-[11px] text-muted-foreground",children:[s.length," rates"]})]}),n.jsxs("div",{className:"flex-1 overflow-auto px-8 py-6 space-y-8",children:[a&&n.jsx("div",{className:"flex items-center justify-center py-20 text-sm text-muted-foreground",children:"Loading pricing rates from Supabase…"}),i&&n.jsxs("div",{className:"flex items-center justify-center py-20 text-sm text-rose-400",children:["Error loading rates — ",i.message]}),!a&&!i&&Object.entries(l).map(([d,u])=>n.jsxs("div",{children:[n.jsxs("div",{className:"flex items-center gap-3 mb-4",children:[n.jsx(LN,{div:d}),n.jsx("span",{className:"text-sm font-semibold text-foreground capitalize",children:d}),n.jsx("div",{className:"flex-1 h-px bg-border"})]}),n.jsxs("div",{className:"space-y-4",children:[j9.filter(p=>u[p]).map(p=>n.jsxs("div",{children:[n.jsx("p",{className:"text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold mb-2 px-1",children:p}),n.jsx("div",{className:"bg-card border border-border rounded-xl overflow-hidden",children:n.jsxs("table",{className:"w-full text-sm",children:[n.jsx("thead",{children:n.jsxs("tr",{className:"border-b border-border text-left",children:[n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Rate Name"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide text-right",children:"Value"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Unit"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Notes"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide whitespace-nowrap",children:"Updated"})]})}),n.jsx("tbody",{className:"divide-y divide-border",children:(u[p]??[]).map(m=>n.jsxs("tr",{className:"hover:bg-muted/20 transition-colors",children:[n.jsx("td",{className:"px-4 py-2.5 text-xs font-medium text-foreground",children:m.rate_name}),n.jsx("td",{className:"px-4 py-2.5 text-xs font-mono font-bold text-primary text-right whitespace-nowrap",children:Number(m.rate_value).toFixed(m.unit==="%"?1:2)}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:m.unit}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground max-w-[280px] truncate",children:m.notes||"—"}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:og(m.updated_at)})]},m.id))})]})})]},p)),Object.entries(u).filter(([p])=>!j9.includes(p)).map(([p,m])=>n.jsxs("div",{children:[n.jsx("p",{className:"text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold mb-2 px-1",children:p}),n.jsx("div",{className:"bg-card border border-border rounded-xl overflow-hidden",children:n.jsx("table",{className:"w-full text-sm",children:n.jsx("tbody",{className:"divide-y divide-border",children:m.map(g=>n.jsxs("tr",{className:"hover:bg-muted/20 transition-colors",children:[n.jsx("td",{className:"px-4 py-2.5 text-xs font-medium text-foreground",children:g.rate_name}),n.jsx("td",{className:"px-4 py-2.5 text-xs font-mono font-bold text-primary text-right whitespace-nowrap",children:Number(g.rate_value).toFixed(g.unit==="%"?1:2)}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:g.unit}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground max-w-[280px] truncate",children:g.notes||"—"}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:og(g.updated_at)})]},g.id))})})})]},p))]})]},d)),!a&&!i&&s.length===0&&n.jsxs("div",{className:"flex flex-col items-center justify-center py-20 text-center",children:[n.jsx(cf,{className:"w-10 h-10 text-muted-foreground/30 mb-3"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:"No pricing rates found"})]})]})]})}const Wce=[{key:"jobs",label:"Installation Jobs",icon:dg},{key:"quotes",label:"Quotes & Calcs",icon:ci},{key:"pricing",label:"Pricing Rates",icon:cf}];function Hce(){const[e,t]=C.useState("jobs");return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden bg-background",children:[n.jsxs("div",{className:"px-8 py-5 border-b border-border flex items-center gap-4 shrink-0",children:[n.jsx(qo,{href:"/ops",children:n.jsx("a",{className:"text-muted-foreground hover:text-foreground transition-colors",children:n.jsx(cg,{className:"w-5 h-5"})})}),n.jsxs("div",{className:"flex-1",children:[n.jsxs("h1",{className:"text-lg font-semibold text-foreground flex items-center gap-2",children:[n.jsx(dg,{className:"w-5 h-5 text-slate-400"}),"ERP / Execution"]}),n.jsx("p",{className:"text-xs text-muted-foreground mt-0.5",children:"Production planning · Quotes · Pricing rates"})]}),n.jsxs("div",{className:"flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400",children:[n.jsx("span",{className:"text-[10px] font-bold uppercase tracking-widest",children:"Beta"}),n.jsx("span",{className:"text-[11px] font-medium",children:"Production Board"})]})]}),n.jsx("div",{className:"px-8 border-b border-border flex items-center gap-0 shrink-0",children:Wce.map(({key:r,label:a,icon:i})=>n.jsxs("button",{onClick:()=>t(r),className:`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${e===r?"border-primary text-primary":"border-transparent text-muted-foreground hover:text-foreground"}`,children:[n.jsx(i,{className:"w-3.5 h-3.5"}),a]},r))}),n.jsxs("div",{className:"flex-1 overflow-hidden",children:[e==="jobs"&&n.jsx(zce,{}),e==="quotes"&&n.jsx(qce,{}),e==="pricing"&&n.jsx(Bce,{})]})]})}function Gce(){return n.jsxs("div",{className:"flex flex-col gap-6 p-6 max-w-5xl mx-auto",children:[n.jsxs("div",{className:"flex items-center justify-between",children:[n.jsx("div",{className:"flex items-center gap-3",children:n.jsx(qo,{href:"/ops",children:n.jsxs("a",{className:"flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors",children:[n.jsx(cg,{className:"w-4 h-4"})," Operations"]})})}),n.jsx(TN,{className:"bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 text-[10px] uppercase tracking-widest px-2",children:"Beta"})]}),n.jsxs("div",{className:"flex items-center gap-3",children:[n.jsx("div",{className:"w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center",children:n.jsx(Uu,{className:"w-5 h-5 text-primary"})}),n.jsxs("div",{children:[n.jsx("h1",{className:"text-xl font-bold tracking-tight",children:"SIOP"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:"Sales, Inventory & Operations Planning"})]})]}),n.jsxs("div",{className:"rounded-xl border border-border bg-card p-5 flex items-start gap-4",children:[n.jsx(Si,{className:"w-5 h-5 text-amber-400 shrink-0 mt-0.5"}),n.jsxs("div",{children:[n.jsx("p",{className:"text-sm font-semibold mb-1",children:"Module in development"}),n.jsx("p",{className:"text-sm text-muted-foreground leading-relaxed",children:"The SIOP module will integrate your sales pipeline data with production capacity, inventory levels, and procurement scheduling to produce a synchronized rolling plan. This beta stub is a placeholder — full functionality is coming soon."})]})]}),n.jsx("div",{className:"grid grid-cols-2 gap-4 sm:grid-cols-4",children:[{icon:ao,label:"Demand Planning",desc:"Rolling 12-week forecast from BD pipeline"},{icon:Ic,label:"Inventory Sync",desc:"Raw material & finished goods alignment"},{icon:gh,label:"Capacity Planning",desc:"Production floor load vs. available hours"},{icon:Ad,label:"S&OP Dashboard",desc:"Executive-level plan vs. actual view"}].map(({icon:e,label:t,desc:r})=>n.jsxs("div",{className:"rounded-xl border border-border bg-card p-4 opacity-60 select-none",children:[n.jsx("div",{className:"w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center mb-3",children:n.jsx(e,{className:"w-4 h-4 text-muted-foreground"})}),n.jsx("p",{className:"text-sm font-semibold mb-1",children:t}),n.jsx("p",{className:"text-xs text-muted-foreground leading-relaxed",children:r})]},t))}),n.jsxs("div",{className:"flex items-center gap-2 text-xs text-muted-foreground/60",children:[n.jsx(dg,{className:"w-3 h-3"}),n.jsx("span",{children:"Spectrum Universe · Operations Planning · v0.1-beta"})]})]})}const Kce=["mlippmann@spectrumadvanced.com","dkearney@spectrumadvanced.com","gsantinelli@spectrumadvanced.com"],Vce="mlippmann@spectrumadvanced.com";function Gm(e){return e.email===Vce||e.role==="super_admin"?"super_admin":e.role}function fD(){const e="ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";let t="";for(let r=0;r<10;r++)t+=e[Math.floor(Math.random()*e.length)];return"Sp!"+t}function Qce(e){return e.split(" ").map(t=>t[0]).join("").slice(0,2).toUpperCase()}function Yce(e){const t=["bg-blue-500/20 text-blue-400","bg-purple-500/20 text-purple-400","bg-teal-500/20 text-teal-400","bg-amber-500/20 text-amber-400","bg-rose-500/20 text-rose-400","bg-emerald-500/20 text-emerald-400"];let r=0;for(const a of e)r=r*31+a.charCodeAt(0)&65535;return t[r%t.length]}function Xce({onClose:e,onSuccess:t}){const[r,a]=C.useState({first_name:"",last_name:"",email:"",role:"user",phone_8x8:"",cell_phone:""}),[i,o]=C.useState(!1),[s,l]=C.useState(""),[d,u]=C.useState(null),[p,m]=C.useState(!1),g=C.useRef(fD());async function h(w){if(w.preventDefault(),!r.first_name||!r.last_name||!r.email){l("First name, last name and email are required.");return}o(!0),l("");try{await Hp("register_user",{p_first_name:r.first_name.trim(),p_last_name:r.last_name.trim(),p_email:r.email.trim().toLowerCase(),p_password:g.current,p_role:r.role,p_phone_8x8:r.phone_8x8||null,p_cell_phone:r.cell_phone||null}),u({email:r.email.trim().toLowerCase(),password:g.current,name:`${r.first_name.trim()} ${r.last_name.trim()}`}),t()}catch(j){l(j.message||"Failed to create user")}finally{o(!1)}}function y(){d&&(navigator.clipboard.writeText(`Email: ${d.email}
+}function qce(){const[e,t]=C.useState(""),[r,a]=C.useState("all"),{data:i=[],isLoading:o,error:s}=Mt({queryKey:["erp-quotes"],queryFn:()=>Ct("quotes","select=*&order=created_at.desc"),staleTime:3e4}),l=i.reduce((h,y)=>h+(y.total??0),0),d=i.filter(h=>h.status==="won"||h.status==="invoiced").length,u=i.filter(h=>h.status==="draft").length,p=i.filter(h=>h.status==="sent").length,m=["all",...Array.from(new Set(i.map(h=>(h.division??"").toLowerCase()).filter(Boolean)))],g=i.filter(h=>{const y=e.toLowerCase(),v=(h.quote_number??"").toLowerCase().includes(y)||(h.title??"").toLowerCase().includes(y)||(h.contact_name??"").toLowerCase().includes(y)||(h.prepared_by??"").toLowerCase().includes(y),w=r==="all"||(h.division??"").toLowerCase()===r;return v&&w});return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[n.jsx("div",{className:"px-8 py-4 border-b border-border grid grid-cols-4 gap-4 shrink-0",children:[{label:"Total Value",value:v9(l),color:"text-primary",Icon:cf,raw:!0},{label:"Won / Invoiced",value:String(d),color:"text-emerald-400",Icon:Ed},{label:"Sent",value:String(p),color:"text-blue-400",Icon:ci},{label:"Drafts",value:String(u),color:"text-slate-400",Icon:Go}].map(({label:h,value:y,color:v,Icon:w})=>n.jsxs("div",{className:"bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3",children:[n.jsx(w,{className:`w-5 h-5 ${v} shrink-0`}),n.jsxs("div",{children:[n.jsx("p",{className:"text-[11px] text-muted-foreground/70 uppercase tracking-wide font-semibold",children:h}),n.jsx("p",{className:`text-xl font-bold ${v}`,children:y})]})]},h))}),n.jsxs("div",{className:"px-8 py-3 border-b border-border flex items-center gap-3 shrink-0",children:[n.jsxs("div",{className:"relative flex-1 max-w-xs",children:[n.jsx(wo,{className:"absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground"}),n.jsx(Sg,{className:"pl-8 h-8 text-sm",placeholder:"Search quote #, title, contact…",value:e,onChange:h=>t(h.target.value)})]}),n.jsx("div",{className:"flex gap-1.5",children:m.map(h=>n.jsx("button",{onClick:()=>a(h),className:`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${r===h?"bg-primary text-primary-foreground":"bg-muted text-muted-foreground hover:text-foreground"}`,children:h==="all"?"All Divisions":h},h))})]}),n.jsxs("div",{className:"flex-1 overflow-auto",children:[o&&n.jsx("div",{className:"flex items-center justify-center py-20 text-sm text-muted-foreground",children:"Loading quotes from Supabase…"}),s&&n.jsxs("div",{className:"flex items-center justify-center py-20 text-sm text-rose-400",children:["Error loading quotes — ",s.message]}),!o&&!s&&n.jsxs("table",{className:"w-full text-sm",children:[n.jsx("thead",{className:"sticky top-0 bg-background border-b border-border z-10",children:n.jsx("tr",{className:"text-left",children:["Quote #","Title","Division","Status","Contact","Prepared By","Total","Created"].map(h=>n.jsx("th",{className:"px-4 py-3 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide whitespace-nowrap",children:h},h))})}),n.jsx("tbody",{className:"divide-y divide-border",children:g.map(h=>{const y=Uce[h.status??"draft"]??{label:h.status??"—",color:"text-muted-foreground",bg:"bg-muted"};return n.jsxs("tr",{className:"hover:bg-muted/30 transition-colors",children:[n.jsx("td",{className:"px-4 py-3 font-mono text-xs font-medium text-foreground whitespace-nowrap",children:h.quote_number||"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate",children:h.title}),n.jsx("td",{className:"px-4 py-3",children:h.division?n.jsx(LN,{div:h.division}):n.jsx("span",{className:"text-muted-foreground/40 text-xs",children:"—"})}),n.jsx("td",{className:"px-4 py-3",children:n.jsx("span",{className:`px-2 py-0.5 rounded-full text-[11px] font-medium ${y.bg} ${y.color}`,children:y.label})}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:h.contact_name||"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:h.prepared_by||"—"}),n.jsx("td",{className:"px-4 py-3 font-medium text-foreground text-xs whitespace-nowrap",children:h.total!=null?v9(h.total):"—"}),n.jsx("td",{className:"px-4 py-3 text-muted-foreground text-xs whitespace-nowrap",children:og(h.created_at)})]},h.id)})})]}),!o&&!s&&g.length===0&&n.jsxs("div",{className:"flex flex-col items-center justify-center py-20 text-center",children:[n.jsx(ci,{className:"w-10 h-10 text-muted-foreground/30 mb-3"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:i.length===0?"No quotes found in Supabase":"No quotes match your filter"})]})]})]})}function Bce(){const[e,t]=C.useState("all"),{data:r=[],isLoading:a,error:i}=Mt({queryKey:["erp-pricing-rates"],queryFn:()=>Ct("pricing_rates","select=*&active=eq.true&order=division.asc,sort_order.asc"),staleTime:6e4}),o=["all",...Array.from(new Set(r.map(d=>d.division)))],s=e==="all"?r:r.filter(d=>d.division===e),l={};for(const d of s)l[d.division]||(l[d.division]={}),l[d.division][d.category]||(l[d.division][d.category]=[]),l[d.division][d.category].push(d);return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[n.jsxs("div",{className:"px-8 py-3 border-b border-border flex items-center gap-3 shrink-0",children:[n.jsx("span",{className:"text-xs text-muted-foreground font-medium",children:"Division:"}),n.jsx("div",{className:"flex gap-1.5",children:o.map(d=>n.jsx("button",{onClick:()=>t(d),className:`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${e===d?"bg-primary text-primary-foreground":"bg-muted text-muted-foreground hover:text-foreground"}`,children:d==="all"?"All Divisions":d},d))}),n.jsxs("span",{className:"ml-auto text-[11px] text-muted-foreground",children:[s.length," rates"]})]}),n.jsxs("div",{className:"flex-1 overflow-auto px-8 py-6 space-y-8",children:[a&&n.jsx("div",{className:"flex items-center justify-center py-20 text-sm text-muted-foreground",children:"Loading pricing rates from Supabase…"}),i&&n.jsxs("div",{className:"flex items-center justify-center py-20 text-sm text-rose-400",children:["Error loading rates — ",i.message]}),!a&&!i&&Object.entries(l).map(([d,u])=>n.jsxs("div",{children:[n.jsxs("div",{className:"flex items-center gap-3 mb-4",children:[n.jsx(LN,{div:d}),n.jsx("span",{className:"text-sm font-semibold text-foreground capitalize",children:d}),n.jsx("div",{className:"flex-1 h-px bg-border"})]}),n.jsxs("div",{className:"space-y-4",children:[j9.filter(p=>u[p]).map(p=>n.jsxs("div",{children:[n.jsx("p",{className:"text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold mb-2 px-1",children:p}),n.jsx("div",{className:"bg-card border border-border rounded-xl overflow-hidden",children:n.jsxs("table",{className:"w-full text-sm",children:[n.jsx("thead",{children:n.jsxs("tr",{className:"border-b border-border text-left",children:[n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Rate Name"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide text-right",children:"Value"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Unit"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide",children:"Notes"}),n.jsx("th",{className:"px-4 py-2 text-[11px] font-semibold text-muted-foreground/70 uppercase tracking-wide whitespace-nowrap",children:"Updated"})]})}),n.jsx("tbody",{className:"divide-y divide-border",children:(u[p]??[]).map(m=>n.jsxs("tr",{className:"hover:bg-muted/20 transition-colors",children:[n.jsx("td",{className:"px-4 py-2.5 text-xs font-medium text-foreground",children:m.rate_name}),n.jsx("td",{className:"px-4 py-2.5 text-xs font-mono font-bold text-primary text-right whitespace-nowrap",children:Number(m.rate_value).toFixed(m.unit==="%"?1:2)}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:m.unit}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground max-w-[280px] truncate",children:m.notes||"—"}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:og(m.updated_at)})]},m.id))})]})})]},p)),Object.entries(u).filter(([p])=>!j9.includes(p)).map(([p,m])=>n.jsxs("div",{children:[n.jsx("p",{className:"text-[10px] text-muted-foreground/50 uppercase tracking-widest font-bold mb-2 px-1",children:p}),n.jsx("div",{className:"bg-card border border-border rounded-xl overflow-hidden",children:n.jsx("table",{className:"w-full text-sm",children:n.jsx("tbody",{className:"divide-y divide-border",children:m.map(g=>n.jsxs("tr",{className:"hover:bg-muted/20 transition-colors",children:[n.jsx("td",{className:"px-4 py-2.5 text-xs font-medium text-foreground",children:g.rate_name}),n.jsx("td",{className:"px-4 py-2.5 text-xs font-mono font-bold text-primary text-right whitespace-nowrap",children:Number(g.rate_value).toFixed(g.unit==="%"?1:2)}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:g.unit}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground max-w-[280px] truncate",children:g.notes||"—"}),n.jsx("td",{className:"px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap",children:og(g.updated_at)})]},g.id))})})})]},p))]})]},d)),!a&&!i&&s.length===0&&n.jsxs("div",{className:"flex flex-col items-center justify-center py-20 text-center",children:[n.jsx(cf,{className:"w-10 h-10 text-muted-foreground/30 mb-3"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:"No pricing rates found"})]})]})]})}const Wce=[{key:"work_orders",label:"Work Orders",icon:Ad},{key:"job_dashboard",label:"Job Dashboard",icon:gh},{key:"woodshop",label:"Woodshop",icon:Ho},{key:"shipping",label:"Shipping",icon:Ic},{key:"revenue",label:"Revenue",icon:gT},{key:"jobs",label:"Installation Jobs",icon:dg},{key:"quotes",label:"Quotes & Calcs",icon:ci},{key:"pricing",label:"Pricing Rates",icon:cf}];/* ============================================================
+   ERP Module — Work Orders / Jobs / Woodshop / Shipping / Revenue
+   Appended to the bundle. Uses bundle scope: n (jsx), C (React),
+   qd/Ct/jr/$n/ia/ii (rest helpers), gF (base url), xF (headers),
+   _n (auth context hook).
+   ============================================================ */
+function __ERP_StatusBadge(props){
+  var status=props.status||"open";
+  var map={open:"bg-blue-500/20 text-blue-400 border-blue-500/30",in_production:"bg-yellow-500/20 text-yellow-400 border-yellow-500/30",complete:"bg-emerald-500/20 text-emerald-400 border-emerald-500/30",shipped:"bg-slate-500/20 text-slate-400 border-slate-500/30",cancelled:"bg-rose-500/20 text-rose-400 border-rose-500/30",current:"bg-blue-500/20 text-blue-400 border-blue-500/30"};
+  var label=String(status).replace(/_/g," ");
+  return n.jsx("span",{className:"inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider border "+(map[status]||map.open),children:label});
+}
+function __ERP_ProgressBar(props){
+  var p=Math.max(0,Math.min(100,Number(props.pct)||0));
+  return n.jsxs("div",{className:"w-full",children:[
+    n.jsxs("div",{className:"flex items-center justify-between mb-1",children:[
+      n.jsx("span",{className:"text-[10px] text-muted-foreground uppercase tracking-wider",children:"% Complete"}),
+      n.jsx("span",{className:"text-[11px] font-semibold text-foreground",children:p.toFixed(0)+"%"})
+    ]}),
+    n.jsx("div",{className:"h-1.5 bg-muted/40 rounded-full overflow-hidden",children:
+      n.jsx("div",{className:"h-full bg-emerald-500 transition-all",style:{width:p+"%"}})
+    })
+  ]});
+}
+function __ERP_money(v){
+  if(v===null||v===undefined||v==="")return"—";
+  var n2=Number(v);if(isNaN(n2))return"—";
+  return"$"+n2.toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+function __ERP_ymd(d){
+  if(!d)return"—";try{return new Date(d).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"});}catch(e){return d;}
+}
+var __ERP_MATERIAL_OPTS=[
+  {value:"f_clear_20_b",label:"F-Clear 20 B"},
+  {value:"f_clear_20_nb",label:"F-Clear 20 NB"},
+  {value:"f_clear_60_b",label:"F-Clear 60 B"},
+  {value:"f_clear_60_nb",label:"F-Clear 60 NB"},
+  {value:"pfa_060",label:"PFA 0.060"}
+];
+var __ERP_ROLL_TYPES=["B","NB","Banana Roll","Bowed Roll","Canvas Roll","Expander Roll","Fabric Roll","Felt Roll","Guide Roll","Rubber Roll"];
+function __ERP_etchingRule(material,job_type,prev_etched){
+  if(!material||!job_type)return{value:false,disabled:false};
+  var endsB=material.endsWith("_b");
+  var endsNB=material.endsWith("_nb")||material==="pfa_060";
+  if(endsNB)return{value:false,disabled:true};
+  if(endsB){
+    if(job_type==="expansion")return{value:true,disabled:true};
+    if(job_type==="pull_and_ship")return{value:!prev_etched,disabled:false};
+  }
+  return{value:false,disabled:false};
+}
+function __ERP_taskSeed(jobType){
+  var prep_exp=["Confirm work order attached matches job","Etch pulled and warmed","Double check inventory selection","Confirm table clean","Pull sleeve","Confirm min/max within spec","Identify endplugs","Install endplugs","Identify bag","Mark bag","Sew bag"];
+  var expand_exp=["Confirm table clean","Check bag","Etch sleeve","Expand to spec","Measurement Check","Cut sleeve, move to prep table","Check bag"];
+  var pack_exp=["Dry sleeve","Test rings","Cut ears (if required)","Re-inventory remnant","Inventory Sticker Applied","Pack","Final QA/QC","Pull shipping packet and complete","Record tube weight"];
+  var prep_ps=["Confirm work order attached matches job","Pull sleeve from inventory","Measure and mark cut length","Cut to length","Re-inventory remnant (if ≥ minimum usable length)"];
+  var pack_ps=["Dry sleeve","Inventory Sticker Applied","Pack","Final QA/QC","Pull shipping packet and complete","Record tube weight"];
+  var rows=[];
+  if(jobType==="pull_and_ship"){
+    prep_ps.forEach(function(t,i){rows.push({phase:"PREP",task_sequence:i+1,task_name:t,has_photo:(i===0)});});
+    pack_ps.forEach(function(t,i){rows.push({phase:"PACK",task_sequence:i+1,task_name:t,has_photo:(i===3)});});
+  }else{
+    prep_exp.forEach(function(t,i){rows.push({phase:"PREP",task_sequence:i+1,task_name:t,has_photo:(i===0)});});
+    expand_exp.forEach(function(t,i){rows.push({phase:"EXPAND",task_sequence:i+1,task_name:t,has_photo:false});});
+    pack_exp.forEach(function(t,i){rows.push({phase:"PACK",task_sequence:i+1,task_name:t,has_photo:(i===6)});});
+  }
+  return rows;
+}
+function __ERP_totalTasks(jobType){return jobType==="pull_and_ship"?11:27;}
+
+/* ============================================================
+   Work Orders Tab
+   ============================================================ */
+function __ERP_WorkOrdersTab(){
+  var s=C.useState([]),wos=s[0],setWos=s[1];
+  var s2=C.useState(true),loading=s2[0],setLoading=s2[1];
+  var s3=C.useState("all"),filter=s3[0],setFilter=s3[1];
+  var s4=C.useState(null),selectedWoId=s4[0],setSelectedWoId=s4[1];
+  var s5=C.useState(false),showNew=s5[0],setShowNew=s5[1];
+  var s6=C.useState(0),refreshKey=s6[0],setRefreshKey=s6[1];
+
+  C.useEffect(function(){
+    setLoading(true);
+    Ct("work_orders","select=*&order=created_at.desc").then(function(rows){
+      setWos(Array.isArray(rows)?rows:[]);
+    }).catch(function(){setWos([]);}).finally(function(){setLoading(false);});
+  },[refreshKey]);
+
+  if(selectedWoId){
+    return n.jsx(__ERP_WoDetail,{woId:selectedWoId,onBack:function(){setSelectedWoId(null);setRefreshKey(refreshKey+1);}});
+  }
+
+  var filtered=wos.filter(function(w){if(filter==="all")return true;return w.status===filter;});
+  var statuses=[["all","All"],["open","Open"],["in_production","In Production"],["complete","Complete"],["shipped","Shipped"]];
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsxs("div",{className:"px-6 py-4 border-b border-border flex items-center gap-4 shrink-0",children:[
+      n.jsx("h2",{className:"text-base font-semibold",children:"Work Orders"}),
+      n.jsx("div",{className:"flex items-center gap-1 ml-2",children:statuses.map(function(p){
+        return n.jsx("button",{onClick:function(){setFilter(p[0]);},className:"px-2.5 py-1 text-[11px] rounded "+(filter===p[0]?"bg-primary/15 text-primary":"text-muted-foreground hover:text-foreground"),children:p[1]},p[0]);
+      })}),
+      n.jsx("div",{className:"flex-1"}),
+      n.jsx("button",{onClick:function(){setShowNew(true);},className:"px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded hover:opacity-90",children:"+ New Work Order"})
+    ]}),
+    n.jsx("div",{className:"flex-1 overflow-auto",children:
+      loading?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"Loading…"}):
+      filtered.length===0?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"No work orders found. Click \"New Work Order\" to create one."}):
+      n.jsxs("table",{className:"w-full text-sm",children:[
+        n.jsx("thead",{className:"bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground",children:
+          n.jsxs("tr",{children:[
+            n.jsx("th",{className:"text-left px-4 py-2.5",children:"WO #"}),
+            n.jsx("th",{className:"text-left px-4 py-2.5",children:"Customer"}),
+            n.jsx("th",{className:"text-left px-4 py-2.5",children:"PO #"}),
+            n.jsx("th",{className:"text-left px-4 py-2.5",children:"Ship Date"}),
+            n.jsx("th",{className:"text-left px-4 py-2.5",children:"Status"}),
+            n.jsx("th",{className:"text-right px-4 py-2.5",children:"Value"})
+          ]})
+        }),
+        n.jsx("tbody",{children:filtered.map(function(w){
+          return n.jsxs("tr",{onClick:function(){setSelectedWoId(w.id);},className:"border-b border-border/50 hover:bg-muted/20 cursor-pointer",children:[
+            n.jsx("td",{className:"px-4 py-2.5 font-semibold text-foreground",children:w.wo_number}),
+            n.jsx("td",{className:"px-4 py-2.5 text-foreground",children:w.customer_name}),
+            n.jsx("td",{className:"px-4 py-2.5 text-muted-foreground",children:w.po_number||"—"}),
+            n.jsx("td",{className:"px-4 py-2.5 text-muted-foreground",children:__ERP_ymd(w.scheduled_ship_date)}),
+            n.jsx("td",{className:"px-4 py-2.5",children:n.jsx(__ERP_StatusBadge,{status:w.status})}),
+            n.jsx("td",{className:"px-4 py-2.5 text-right font-mono text-foreground",children:__ERP_money(w.total_value)})
+          ]},w.id);
+        })})
+      ])
+    }),
+    showNew&&n.jsx(__ERP_NewWoModal,{onClose:function(){setShowNew(false);},onCreated:function(id){setShowNew(false);setRefreshKey(refreshKey+1);setSelectedWoId(id);}})
+  ]});
+}
+
+function __ERP_NewWoModal(props){
+  var s=C.useState({wo_number:"",customer_id:"",customer_name:"",po_number:"",country_location:"us_canada",scheduled_ship_date:"",install:false,payment_type:"collect",additional_pkg:"none",carrier:"",freight_charges:"",special_instructions:""}),form=s[0],setForm=s[1];
+  var s2=C.useState(""),err=s2[0],setErr=s2[1];
+  var s3=C.useState(false),saving=s3[0],setSaving=s3[1];
+  var s4=C.useState([]),companies=s4[0],setCompanies=s4[1];
+  var s5=C.useState(""),custSearch=s5[0],setCustSearch=s5[1];
+  var s6=C.useState(false),showCustList=s6[0],setShowCustList=s6[1];
+
+  C.useEffect(function(){
+    Ct("companies","select=id,name&order=name&limit=500").then(function(r){setCompanies(Array.isArray(r)?r:[]);}).catch(function(){});
+  },[]);
+
+  function update(k,v){var f={};f[k]=v;setForm(Object.assign({},form,f));}
+  function pickCustomer(c){update("customer_id",c.id);update("customer_name",c.name);setCustSearch(c.name);setShowCustList(false);}
+
+  async function save(e){
+    e.preventDefault();setErr("");
+    if(!form.wo_number||!form.wo_number.trim()){setErr("WO # is required");return;}
+    if(!form.customer_name||!form.customer_name.trim()){setErr("Customer is required");return;}
+    setSaving(true);
+    try{
+      var body={
+        wo_number:form.wo_number.trim(),
+        customer_id:form.customer_id||null,
+        customer_name:form.customer_name.trim(),
+        po_number:form.po_number||null,
+        country_location:form.country_location,
+        scheduled_ship_date:form.scheduled_ship_date||null,
+        install:!!form.install,
+        payment_type:form.payment_type,
+        additional_pkg:form.additional_pkg,
+        carrier:form.carrier||null,
+        freight_charges:form.freight_charges===""?null:Number(form.freight_charges),
+        special_instructions:form.special_instructions||null,
+        status:"open"
+      };
+      var row=await jr("work_orders",body);
+      props.onCreated(row.id);
+    }catch(ex){setErr(ex.message||"Failed to create work order");setSaving(false);}
+  }
+
+  var custMatches=companies.filter(function(c){return!custSearch||(c.name||"").toLowerCase().indexOf(custSearch.toLowerCase())>=0;}).slice(0,8);
+
+  return n.jsx("div",{className:"fixed inset-0 z-50 bg-black/60 flex items-start justify-center pt-12 overflow-auto",onClick:function(){props.onClose();},children:
+    n.jsxs("form",{onClick:function(e){e.stopPropagation();},onSubmit:save,className:"bg-card border border-border rounded-xl w-full max-w-xl p-6 shadow-xl",children:[
+      n.jsxs("div",{className:"flex items-center justify-between mb-4",children:[
+        n.jsx("h3",{className:"text-lg font-semibold",children:"New Work Order"}),
+        n.jsx("button",{type:"button",onClick:function(){props.onClose();},className:"text-muted-foreground hover:text-foreground",children:"✕"})
+      ]}),
+      err&&n.jsx("div",{className:"mb-3 p-2 text-xs rounded bg-rose-500/10 text-rose-400 border border-rose-500/30",children:err}),
+      n.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[
+        __ERP_field("WO #",n.jsx("input",{value:form.wo_number,onChange:function(e){update("wo_number",e.target.value);},required:true,className:__ERP_inputCls})),
+        n.jsxs("div",{className:"col-span-2 relative",children:[
+          n.jsx("label",{className:__ERP_lblCls,children:"Customer"}),
+          n.jsx("input",{value:custSearch||form.customer_name,onChange:function(e){setCustSearch(e.target.value);update("customer_name",e.target.value);update("customer_id","");setShowCustList(true);},onFocus:function(){setShowCustList(true);},placeholder:"Search companies or enter manually",className:__ERP_inputCls}),
+          showCustList&&custMatches.length>0&&n.jsx("div",{className:"absolute z-10 left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg max-h-56 overflow-auto",children:custMatches.map(function(c){
+            return n.jsx("button",{type:"button",onClick:function(){pickCustomer(c);},className:"w-full text-left px-3 py-2 text-sm hover:bg-muted/40",children:c.name},c.id);
+          })})
+        ]}),
+        __ERP_field("PO #",n.jsx("input",{value:form.po_number,onChange:function(e){update("po_number",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Country/Location",n.jsxs("select",{value:form.country_location,onChange:function(e){update("country_location",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"us_canada",children:"US/Canada"}),n.jsx("option",{value:"international",children:"International"})]})),
+        __ERP_field("Scheduled Ship Date",n.jsx("input",{type:"date",value:form.scheduled_ship_date,onChange:function(e){update("scheduled_ship_date",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Install",n.jsxs("select",{value:form.install?"yes":"no",onChange:function(e){update("install",e.target.value==="yes");},className:__ERP_inputCls,children:[n.jsx("option",{value:"no",children:"No"}),n.jsx("option",{value:"yes",children:"Yes"})]})),
+        __ERP_field("Payment Type",n.jsxs("select",{value:form.payment_type,onChange:function(e){update("payment_type",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"collect",children:"Collect"}),n.jsx("option",{value:"prepaid",children:"Prepaid"})]})),
+        __ERP_field("Additional Packaging",n.jsxs("select",{value:form.additional_pkg,onChange:function(e){update("additional_pkg",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"none",children:"None"}),n.jsx("option",{value:"crate",children:"Crate"}),n.jsx("option",{value:"skid",children:"Skid"})]})),
+        __ERP_field("Carrier",n.jsx("input",{value:form.carrier,onChange:function(e){update("carrier",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Freight Charges ($)",n.jsx("input",{type:"number",step:"0.01",value:form.freight_charges,onChange:function(e){update("freight_charges",e.target.value);},className:__ERP_inputCls})),
+        n.jsxs("div",{className:"col-span-2",children:[
+          n.jsx("label",{className:__ERP_lblCls,children:"Special Instructions"}),
+          n.jsx("textarea",{rows:3,value:form.special_instructions,onChange:function(e){update("special_instructions",e.target.value);},className:__ERP_inputCls})
+        ]})
+      ]}),
+      n.jsxs("div",{className:"flex items-center justify-end gap-2 mt-5",children:[
+        n.jsx("button",{type:"button",onClick:function(){props.onClose();},className:"px-3 py-1.5 text-xs rounded border border-border",children:"Cancel"}),
+        n.jsx("button",{type:"submit",disabled:saving,className:"px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground disabled:opacity-50",children:saving?"Saving…":"Create"})
+      ]})
+    ]})
+  });
+}
+
+var __ERP_inputCls="w-full px-2.5 py-1.5 text-sm bg-background border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
+var __ERP_lblCls="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1";
+function __ERP_field(label,input){
+  return n.jsxs("div",{children:[
+    n.jsx("label",{className:__ERP_lblCls,children:label}),
+    input
+  ]});
+}
+
+/* ============================================================
+   WO Detail
+   ============================================================ */
+function __ERP_WoDetail(props){
+  var s=C.useState(null),wo=s[0],setWo=s[1];
+  var s2=C.useState([]),jobs=s2[0],setJobs=s2[1];
+  var s3=C.useState("jobs"),tab=s3[0],setTab=s3[1];
+  var s4=C.useState(false),addingJob=s4[0],setAddingJob=s4[1];
+  var s5=C.useState(0),rk=s5[0],setRk=s5[1];
+  var s6=C.useState(null),selectedJobId=s6[0],setSelectedJobId=s6[1];
+
+  C.useEffect(function(){
+    Ct("work_orders","id=eq."+props.woId+"&select=*").then(function(r){setWo(Array.isArray(r)&&r[0]?r[0]:null);});
+    Ct("erp_jobs","work_order_id=eq."+props.woId+"&select=*&order=job_index.asc").then(function(r){setJobs(Array.isArray(r)?r:[]);});
+  },[props.woId,rk]);
+
+  if(selectedJobId){
+    return n.jsx(__ERP_JobExec,{jobId:selectedJobId,onBack:function(){setSelectedJobId(null);setRk(rk+1);}});
+  }
+  if(!wo)return n.jsx("div",{className:"p-8 text-sm text-muted-foreground",children:"Loading…"});
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsxs("div",{className:"px-6 py-4 border-b border-border flex items-center gap-3 shrink-0",children:[
+      n.jsx("button",{onClick:function(){props.onBack();},className:"text-muted-foreground hover:text-foreground text-sm",children:"← Back"}),
+      n.jsx("h2",{className:"text-base font-semibold",children:"WO "+wo.wo_number}),
+      n.jsx("span",{className:"text-sm text-muted-foreground",children:wo.customer_name}),
+      n.jsx(__ERP_StatusBadge,{status:wo.status}),
+      n.jsx("div",{className:"flex-1"}),
+      n.jsx("span",{className:"text-xs text-muted-foreground",children:"Ship: "+__ERP_ymd(wo.scheduled_ship_date)})
+    ]}),
+    n.jsx("div",{className:"px-6 border-b border-border flex items-center gap-0 shrink-0",children:[["jobs","Jobs"],["packaging","Packaging"],["notes","Notes"]].map(function(p){
+      return n.jsx("button",{onClick:function(){setTab(p[0]);},className:"px-4 py-2.5 text-xs font-medium border-b-2 "+(tab===p[0]?"border-primary text-primary":"border-transparent text-muted-foreground hover:text-foreground"),children:p[1]},p[0]);
+    })}),
+    n.jsx("div",{className:"flex-1 overflow-auto p-6",children:
+      tab==="jobs"?n.jsx(__ERP_WoJobsTab,{wo:wo,jobs:jobs,onAdd:function(){setAddingJob(true);},onOpen:function(id){setSelectedJobId(id);},onClone:function(j){__ERP_cloneJob(j,wo).then(function(){setRk(rk+1);});}}):
+      tab==="packaging"?n.jsx(__ERP_WoPackagingTab,{wo:wo,onChange:function(){setRk(rk+1);}}):
+      n.jsx(__ERP_WoNotesTab,{wo:wo,onChange:function(){setRk(rk+1);}})
+    }),
+    addingJob&&n.jsx(__ERP_AddJobModal,{wo:wo,nextIndex:jobs.length+1,onClose:function(){setAddingJob(false);},onCreated:function(){setAddingJob(false);setRk(rk+1);}})
+  ]});
+}
+
+function __ERP_WoJobsTab(props){
+  var jobs=props.jobs||[];
+  return n.jsxs("div",{children:[
+    n.jsxs("div",{className:"flex items-center justify-between mb-3",children:[
+      n.jsx("h3",{className:"text-sm font-semibold",children:"Jobs ("+jobs.length+")"}),
+      n.jsx("button",{onClick:function(){props.onAdd();},className:"px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded",children:"+ Add Job"})
+    ]}),
+    jobs.length===0?n.jsx("div",{className:"p-6 text-center text-sm text-muted-foreground border border-dashed border-border rounded",children:"No jobs yet."}):
+    n.jsxs("table",{className:"w-full text-sm",children:[
+      n.jsx("thead",{className:"bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground",children:n.jsxs("tr",{children:[
+        n.jsx("th",{className:"text-left px-3 py-2",children:"Job #"}),
+        n.jsx("th",{className:"text-left px-3 py-2",children:"Roll Type"}),
+        n.jsx("th",{className:"text-left px-3 py-2",children:"Material"}),
+        n.jsx("th",{className:"text-right px-3 py-2",children:"Diam"}),
+        n.jsx("th",{className:"text-right px-3 py-2",children:"Length"}),
+        n.jsx("th",{className:"text-right px-3 py-2",children:"Qty"}),
+        n.jsx("th",{className:"text-left px-3 py-2",children:"Status"}),
+        n.jsx("th",{className:"text-right px-3 py-2",children:"% Comp"}),
+        n.jsx("th",{className:"text-right px-3 py-2",children:""})
+      ]})}),
+      n.jsx("tbody",{children:jobs.map(function(j){
+        var matLabel=(__ERP_MATERIAL_OPTS.find(function(m){return m.value===j.material_type;})||{}).label||j.material_type;
+        return n.jsxs("tr",{className:"border-b border-border/50 hover:bg-muted/20",children:[
+          n.jsx("td",{className:"px-3 py-2 font-semibold cursor-pointer",onClick:function(){props.onOpen(j.id);},children:j.job_number}),
+          n.jsx("td",{className:"px-3 py-2 text-muted-foreground",children:j.roll_type||"—"}),
+          n.jsx("td",{className:"px-3 py-2",children:matLabel}),
+          n.jsx("td",{className:"px-3 py-2 text-right font-mono",children:j.roll_diameter}),
+          n.jsx("td",{className:"px-3 py-2 text-right font-mono",children:j.roll_length}),
+          n.jsx("td",{className:"px-3 py-2 text-right",children:j.quantity}),
+          n.jsx("td",{className:"px-3 py-2",children:n.jsx(__ERP_StatusBadge,{status:j.status})}),
+          n.jsx("td",{className:"px-3 py-2 text-right font-mono",children:(Number(j.pct_complete)||0).toFixed(0)+"%"}),
+          n.jsxs("td",{className:"px-3 py-2 text-right space-x-2",children:[
+            n.jsx("button",{onClick:function(){props.onOpen(j.id);},className:"text-[11px] text-primary hover:underline",children:"Open"}),
+            n.jsx("button",{onClick:function(){props.onClone(j);},className:"text-[11px] text-muted-foreground hover:text-foreground",children:"Clone"})
+          ]})
+        ]},j.id);
+      })})
+    ])
+  ]});
+}
+
+function __ERP_WoPackagingTab(props){
+  var wo=props.wo;
+  var s=C.useState({additional_pkg:wo.additional_pkg||"none",carrier:wo.carrier||"",tracking_number:wo.tracking_number||"",freight_charges:wo.freight_charges||"",payment_type:wo.payment_type||"collect",install:!!wo.install}),f=s[0],setF=s[1];
+  var s2=C.useState(false),saving=s2[0],setSaving=s2[1];
+  function upd(k,v){var o={};o[k]=v;setF(Object.assign({},f,o));}
+  async function save(){
+    setSaving(true);
+    try{
+      await ia("work_orders","id=eq."+wo.id,{additional_pkg:f.additional_pkg,carrier:f.carrier||null,tracking_number:f.tracking_number||null,freight_charges:f.freight_charges===""?null:Number(f.freight_charges),payment_type:f.payment_type,install:!!f.install,updated_at:new Date().toISOString()});
+      props.onChange();
+    }catch(e){alert(e.message);}finally{setSaving(false);}
+  }
+  return n.jsxs("div",{className:"max-w-xl space-y-3",children:[
+    __ERP_field("Additional Pkg",n.jsxs("select",{value:f.additional_pkg,onChange:function(e){upd("additional_pkg",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"none",children:"None"}),n.jsx("option",{value:"crate",children:"Crate"}),n.jsx("option",{value:"skid",children:"Skid"})]})),
+    __ERP_field("Carrier",n.jsx("input",{value:f.carrier,onChange:function(e){upd("carrier",e.target.value);},className:__ERP_inputCls})),
+    __ERP_field("Tracking #",n.jsx("input",{value:f.tracking_number,onChange:function(e){upd("tracking_number",e.target.value);},className:__ERP_inputCls})),
+    __ERP_field("Freight Charges ($)",n.jsx("input",{type:"number",step:"0.01",value:f.freight_charges,onChange:function(e){upd("freight_charges",e.target.value);},className:__ERP_inputCls})),
+    __ERP_field("Payment Type",n.jsxs("select",{value:f.payment_type,onChange:function(e){upd("payment_type",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"collect",children:"Collect"}),n.jsx("option",{value:"prepaid",children:"Prepaid"})]})),
+    __ERP_field("Install",n.jsxs("select",{value:f.install?"yes":"no",onChange:function(e){upd("install",e.target.value==="yes");},className:__ERP_inputCls,children:[n.jsx("option",{value:"no",children:"No"}),n.jsx("option",{value:"yes",children:"Yes"})]})),
+    n.jsx("button",{onClick:save,disabled:saving,className:"px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded disabled:opacity-50",children:saving?"Saving…":"Save"})
+  ]});
+}
+
+function __ERP_WoNotesTab(props){
+  var wo=props.wo;
+  var s=C.useState(wo.special_instructions||""),txt=s[0],setTxt=s[1];
+  var s2=C.useState(false),saving=s2[0],setSaving=s2[1];
+  async function save(){setSaving(true);try{await ia("work_orders","id=eq."+wo.id,{special_instructions:txt,updated_at:new Date().toISOString()});props.onChange();}catch(e){alert(e.message);}finally{setSaving(false);}}
+  return n.jsxs("div",{className:"max-w-xl space-y-3",children:[
+    n.jsx("label",{className:__ERP_lblCls,children:"Special Instructions"}),
+    n.jsx("textarea",{value:txt,onChange:function(e){setTxt(e.target.value);},rows:8,className:__ERP_inputCls}),
+    n.jsx("button",{onClick:save,disabled:saving,className:"px-3 py-1.5 text-xs bg-primary text-primary-foreground rounded disabled:opacity-50",children:saving?"Saving…":"Save"})
+  ]});
+}
+
+async function __ERP_cloneJob(src,wo){
+  try{
+    var jobs=await Ct("erp_jobs","work_order_id=eq."+wo.id+"&select=job_index");
+    var nextIdx=(jobs||[]).reduce(function(m,j){return Math.max(m,j.job_index||0);},0)+1;
+    var body=Object.assign({},src);
+    delete body.id;delete body.created_at;delete body.updated_at;delete body.pct_complete;
+    body.job_index=nextIdx;
+    body.job_number=wo.wo_number+"-"+nextIdx;
+    body.qa_qc_pending=false;body.pct_complete=0;
+    var row=await jr("erp_jobs",body);
+    var tasks=__ERP_taskSeed(row.job_type).map(function(t){return Object.assign({job_id:row.id},t);});
+    if(tasks.length)await oS("job_tasks",tasks);
+    if(row.job_type==="expansion")await jr("expansion_actuals",{job_id:row.id});
+  }catch(e){alert("Clone failed: "+e.message);}
+}
+
+/* ============================================================
+   Add Job Modal
+   ============================================================ */
+function __ERP_AddJobModal(props){
+  var wo=props.wo;
+  var s=C.useState({roll_diameter:"",roll_length:"",material_type:"",roll_type:"",job_type:"expansion",etching_required:false,quantity:1,inventory_id:""}),f=s[0],setF=s[1];
+  var s2=C.useState(""),err=s2[0],setErr=s2[1];
+  var s3=C.useState(false),saving=s3[0],setSaving=s3[1];
+  var s4=C.useState([]),inv=s4[0],setInv=s4[1];
+  var s5=C.useState(""),invSearch=s5[0],setInvSearch=s5[1];
+  var s6=C.useState(null),pickedInv=s6[0],setPickedInv=s6[1];
+
+  C.useEffect(function(){
+    if(!f.material_type){setInv([]);return;}
+    var q="availability=eq.available&select=*";
+    if(f.material_type)q+="&material_type=eq."+encodeURIComponent(f.material_type);
+    Ct("tube_inventory",q+"&limit=50").then(function(r){setInv(Array.isArray(r)?r:[]);}).catch(function(){setInv([]);});
+  },[f.material_type]);
+
+  var etchRule=__ERP_etchingRule(f.material_type,f.job_type,pickedInv&&pickedInv.previously_etched);
+  C.useEffect(function(){setF(function(prev){return Object.assign({},prev,{etching_required:etchRule.value});});},[f.material_type,f.job_type,pickedInv]);
+
+  function upd(k,v){var o={};o[k]=v;setF(Object.assign({},f,o));}
+
+  async function save(e){
+    e.preventDefault();setErr("");
+    if(!f.roll_diameter||!f.roll_length||!f.material_type){setErr("Roll diameter, roll length, and material type are required");return;}
+    setSaving(true);
+    try{
+      var idx=props.nextIndex;
+      var jobNumber=wo.wo_number+"-"+idx;
+      var body={
+        job_number:jobNumber,
+        work_order_id:wo.id,
+        job_index:idx,
+        roll_diameter:Number(f.roll_diameter),
+        roll_length:Number(f.roll_length),
+        material_type:f.material_type,
+        roll_type:f.roll_type||null,
+        job_type:f.job_type,
+        etching_required:!!f.etching_required,
+        quantity:Number(f.quantity)||1,
+        inventory_id:f.inventory_id||null,
+        status:"current",
+        pct_complete:0
+      };
+      var row=await jr("erp_jobs",body);
+      var tasks=__ERP_taskSeed(f.job_type).map(function(t){return Object.assign({job_id:row.id},t);});
+      if(tasks.length)await oS("job_tasks",tasks);
+      if(f.job_type==="expansion")await jr("expansion_actuals",{job_id:row.id});
+      // Woodshop items
+      if(wo.additional_pkg==="crate")await jr("woodshop_items",{work_order_id:wo.id,job_id:row.id,item_type:"build_crate",status:"pending"});
+      else if(wo.additional_pkg==="skid")await jr("woodshop_items",{work_order_id:wo.id,job_id:row.id,item_type:"build_skid",status:"pending"});
+      if(wo.additional_pkg&&wo.additional_pkg!=="none")await jr("woodshop_items",{work_order_id:wo.id,job_id:row.id,item_type:"cut_tube",status:"pending"});
+      // Reserve inventory
+      if(f.inventory_id)try{await ia("tube_inventory","id=eq."+f.inventory_id,{availability:"reserved"});}catch(_){}
+      props.onCreated(row.id);
+    }catch(ex){setErr(ex.message||"Failed");setSaving(false);}
+  }
+
+  var invMatches=inv.filter(function(it){return!invSearch||(it.tube_number||"").toLowerCase().indexOf(invSearch.toLowerCase())>=0;}).slice(0,8);
+
+  return n.jsx("div",{className:"fixed inset-0 z-50 bg-black/60 flex items-start justify-center pt-12 overflow-auto",onClick:function(){props.onClose();},children:
+    n.jsxs("form",{onClick:function(e){e.stopPropagation();},onSubmit:save,className:"bg-card border border-border rounded-xl w-full max-w-2xl p-6 shadow-xl",children:[
+      n.jsxs("div",{className:"flex items-center justify-between mb-4",children:[
+        n.jsx("h3",{className:"text-lg font-semibold",children:"Add Job to "+wo.wo_number}),
+        n.jsx("button",{type:"button",onClick:function(){props.onClose();},className:"text-muted-foreground hover:text-foreground",children:"✕"})
+      ]}),
+      err&&n.jsx("div",{className:"mb-3 p-2 text-xs rounded bg-rose-500/10 text-rose-400 border border-rose-500/30",children:err}),
+      n.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[
+        __ERP_field("Roll Diameter (in)",n.jsx("input",{type:"number",step:"0.0001",value:f.roll_diameter,onChange:function(e){upd("roll_diameter",e.target.value);},required:true,className:__ERP_inputCls})),
+        __ERP_field("Roll Length (in)",n.jsx("input",{type:"number",step:"0.001",value:f.roll_length,onChange:function(e){upd("roll_length",e.target.value);},required:true,className:__ERP_inputCls})),
+        __ERP_field("Material Type",n.jsxs("select",{value:f.material_type,onChange:function(e){upd("material_type",e.target.value);},required:true,className:__ERP_inputCls,children:[n.jsx("option",{value:"",children:"— select —"})].concat(__ERP_MATERIAL_OPTS.map(function(m){return n.jsx("option",{value:m.value,children:m.label},m.value);}))})),
+        __ERP_field("Roll Type",n.jsxs("select",{value:f.roll_type,onChange:function(e){upd("roll_type",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"",children:"— select —"})].concat(__ERP_ROLL_TYPES.map(function(r){return n.jsx("option",{value:r,children:r},r);}))})),
+        __ERP_field("Job Type",n.jsxs("select",{value:f.job_type,onChange:function(e){upd("job_type",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"expansion",children:"Expansion"}),n.jsx("option",{value:"pull_and_ship",children:"Pull and Ship"})]})),
+        __ERP_field("Quantity",n.jsx("input",{type:"number",min:"1",value:f.quantity,onChange:function(e){upd("quantity",e.target.value);},className:__ERP_inputCls})),
+        n.jsxs("div",{className:"col-span-2",children:[
+          n.jsx("label",{className:__ERP_lblCls,children:"Etching Required"}),
+          n.jsxs("label",{className:"inline-flex items-center gap-2 text-sm",children:[
+            n.jsx("input",{type:"checkbox",checked:!!f.etching_required,disabled:etchRule.disabled,onChange:function(e){upd("etching_required",e.target.checked);},className:"h-4 w-4"}),
+            n.jsx("span",{className:"text-muted-foreground",children:etchRule.disabled?"(auto by material/job type)":(f.etching_required?"Yes":"No")})
+          ]})
+        ]}),
+        n.jsxs("div",{className:"col-span-2",children:[
+          n.jsx("label",{className:__ERP_lblCls,children:"Inventory (Tube)"}),
+          n.jsx("input",{value:invSearch,onChange:function(e){setInvSearch(e.target.value);},placeholder:f.material_type?"Search by tube #":"Pick material type first",className:__ERP_inputCls}),
+          pickedInv&&n.jsxs("div",{className:"mt-1 p-2 text-xs bg-muted/30 border border-border rounded flex items-center justify-between",children:[
+            n.jsxs("span",{children:["Selected: ",n.jsx("b",{children:pickedInv.tube_number||pickedInv.id.slice(0,8)})," · Loc: ",pickedInv.location||"—"," · Etched: ",pickedInv.previously_etched?"Y":"N"]}),
+            n.jsx("button",{type:"button",onClick:function(){setPickedInv(null);upd("inventory_id","");},className:"text-rose-400",children:"clear"})
+          ]}),
+          !pickedInv&&invMatches.length>0&&n.jsx("div",{className:"mt-1 border border-border rounded max-h-44 overflow-auto",children:invMatches.map(function(it){
+            return n.jsxs("button",{type:"button",onClick:function(){setPickedInv(it);upd("inventory_id",it.id);setInvSearch(it.tube_number||"");},className:"w-full text-left px-2 py-1.5 text-xs hover:bg-muted/40 flex justify-between gap-2",children:[
+              n.jsx("span",{className:"font-mono",children:it.tube_number||it.id.slice(0,8)}),
+              n.jsxs("span",{className:"text-muted-foreground",children:["D ",it.initial_diameter||"—"," · L ",it.current_length||"—"," · ",it.location||"—",it.previously_etched?" · etched":""]})
+            ]},it.id);
+          })})
+        ]})
+      ]}),
+      n.jsxs("div",{className:"flex items-center justify-end gap-2 mt-5",children:[
+        n.jsx("button",{type:"button",onClick:function(){props.onClose();},className:"px-3 py-1.5 text-xs rounded border border-border",children:"Cancel"}),
+        n.jsx("button",{type:"submit",disabled:saving,className:"px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground disabled:opacity-50",children:saving?"Saving…":"Add Job"})
+      ]})
+    ]})
+  });
+}
+
+/* ============================================================
+   Job Dashboard
+   ============================================================ */
+function __ERP_JobDashboardTab(){
+  var s=C.useState([]),jobs=s[0],setJobs=s[1];
+  var s2=C.useState(true),loading=s2[0],setLoading=s2[1];
+  var s3=C.useState("all"),filter=s3[0],setFilter=s3[1];
+  var s4=C.useState(0),rk=s4[0],setRk=s4[1];
+  var s5=C.useState(null),selectedId=s5[0],setSelectedId=s5[1];
+  var s6=C.useState({}),woMap=s6[0],setWoMap=s6[1];
+
+  C.useEffect(function(){
+    setLoading(true);
+    Ct("erp_jobs","select=*&order=created_at.desc&limit=200").then(function(rows){
+      setJobs(Array.isArray(rows)?rows:[]);
+      var ids=Array.from(new Set((rows||[]).map(function(r){return r.work_order_id;}))).filter(Boolean);
+      if(ids.length){
+        Ct("work_orders","id=in.("+ids.join(",")+")&select=id,wo_number,customer_name,scheduled_ship_date,status").then(function(wos){
+          var m={};(wos||[]).forEach(function(w){m[w.id]=w;});setWoMap(m);
+        });
+      }
+    }).catch(function(){setJobs([]);}).finally(function(){setLoading(false);});
+  },[rk]);
+
+  if(selectedId)return n.jsx(__ERP_JobExec,{jobId:selectedId,onBack:function(){setSelectedId(null);setRk(rk+1);}});
+
+  var filtered=jobs.filter(function(j){if(filter==="qaqc")return j.qa_qc_pending;return true;});
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsxs("div",{className:"px-6 py-4 border-b border-border flex items-center gap-3 shrink-0",children:[
+      n.jsx("h2",{className:"text-base font-semibold",children:"Job Dashboard"}),
+      n.jsxs("div",{className:"flex items-center gap-1 ml-3",children:[
+        n.jsx("button",{onClick:function(){setFilter("all");},className:"px-2.5 py-1 text-[11px] rounded "+(filter==="all"?"bg-primary/15 text-primary":"text-muted-foreground hover:text-foreground"),children:"All"}),
+        n.jsx("button",{onClick:function(){setFilter("qaqc");},className:"px-2.5 py-1 text-[11px] rounded "+(filter==="qaqc"?"bg-primary/15 text-primary":"text-muted-foreground hover:text-foreground"),children:"QA/QC Ready"})
+      ]}),
+      n.jsx("div",{className:"flex-1"}),
+      n.jsx("button",{onClick:function(){setRk(rk+1);},className:"px-3 py-1.5 text-xs rounded border border-border text-muted-foreground hover:text-foreground",children:"Refresh"})
+    ]}),
+    n.jsx("div",{className:"flex-1 overflow-auto p-6",children:
+      loading?n.jsx("div",{className:"text-sm text-muted-foreground",children:"Loading…"}):
+      filtered.length===0?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"No jobs to show."}):
+      n.jsx("div",{className:"grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4",children:filtered.map(function(j){
+        var wo=woMap[j.work_order_id]||{};
+        var matLabel=(__ERP_MATERIAL_OPTS.find(function(m){return m.value===j.material_type;})||{}).label||j.material_type;
+        return n.jsxs("div",{className:"rounded-lg border border-border bg-card p-4 hover:border-primary/40 transition-colors",children:[
+          n.jsxs("div",{className:"flex items-start justify-between mb-2",children:[
+            n.jsxs("div",{children:[
+              n.jsx("div",{className:"text-base font-bold text-foreground",children:j.job_number}),
+              n.jsx("div",{className:"text-xs text-muted-foreground",children:wo.customer_name||""})
+            ]}),
+            n.jsxs("div",{className:"flex flex-col items-end gap-1",children:[
+              n.jsx(__ERP_StatusBadge,{status:j.status}),
+              j.qa_qc_pending&&n.jsx("span",{className:"text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40",children:"QA/QC Ready"})
+            ]})
+          ]}),
+          n.jsx("div",{className:"mb-3",children:n.jsx(__ERP_ProgressBar,{pct:j.pct_complete})}),
+          n.jsxs("div",{className:"grid grid-cols-2 gap-x-2 gap-y-1 text-[11px] text-muted-foreground mb-3",children:[
+            n.jsxs("div",{children:["Mat: ",n.jsx("span",{className:"text-foreground",children:matLabel})]}),
+            n.jsxs("div",{children:["Diam: ",n.jsx("span",{className:"text-foreground font-mono",children:j.roll_diameter})]}),
+            n.jsxs("div",{children:["Len: ",n.jsx("span",{className:"text-foreground font-mono",children:j.roll_length})]}),
+            n.jsxs("div",{children:["Qty: ",n.jsx("span",{className:"text-foreground",children:j.quantity})]}),
+            n.jsxs("div",{className:"col-span-2",children:["Ship: ",n.jsx("span",{className:"text-foreground",children:__ERP_ymd(wo.scheduled_ship_date)})]})
+          ]}),
+          n.jsx("button",{onClick:function(){setSelectedId(j.id);},className:"w-full px-3 py-1.5 text-xs bg-primary/10 text-primary border border-primary/30 rounded hover:bg-primary/20",children:"Open Job →"})
+        ]},j.id);
+      })})
+    })
+  ]});
+}
+
+/* ============================================================
+   Job Execution View (PREP / EXPAND / PACK)
+   ============================================================ */
+function __ERP_JobExec(props){
+  var s=C.useState(null),job=s[0],setJob=s[1];
+  var s2=C.useState(null),wo=s2[0],setWo=s2[1];
+  var s3=C.useState([]),tasks=s3[0],setTasks=s3[1];
+  var s4=C.useState(null),inv=s4[0],setInv=s4[1];
+  var s5=C.useState(null),actuals=s5[0],setActuals=s5[1];
+  var s6=C.useState("PREP"),phase=s6[0],setPhase=s6[1];
+  var s7=C.useState(0),rk=s7[0],setRk=s7[1];
+  var s8=C.useState(null),timeEntry=s8[0],setTimeEntry=s8[1];
+  var s9=C.useState(""),toast=s9[0],setToast=s9[1];
+
+  C.useEffect(function(){
+    Ct("erp_jobs","id=eq."+props.jobId+"&select=*").then(function(r){var j=Array.isArray(r)&&r[0]?r[0]:null;setJob(j);if(j&&j.inventory_id)Ct("tube_inventory","id=eq."+j.inventory_id+"&select=*").then(function(x){setInv(Array.isArray(x)&&x[0]?x[0]:null);});if(j)Ct("work_orders","id=eq."+j.work_order_id+"&select=*").then(function(x){setWo(Array.isArray(x)&&x[0]?x[0]:null);});});
+    Ct("job_tasks","job_id=eq."+props.jobId+"&select=*&order=phase.asc,task_sequence.asc").then(function(r){setTasks(Array.isArray(r)?r:[]);});
+    Ct("expansion_actuals","job_id=eq."+props.jobId+"&select=*").then(function(r){setActuals(Array.isArray(r)&&r[0]?r[0]:null);});
+    Ct("time_entries","job_id=eq."+props.jobId+"&clocked_out_at=is.null&select=*").then(function(r){setTimeEntry(Array.isArray(r)&&r[0]?r[0]:null);});
+  },[props.jobId,rk]);
+
+  async function toggleTask(t){
+    var newDone=!t.is_done;
+    try{
+      await ia("job_tasks","id=eq."+t.id,{is_done:newDone,done_at:newDone?new Date().toISOString():null});
+      var done=tasks.filter(function(x){return x.id===t.id?newDone:x.is_done;}).length;
+      var total=job?__ERP_totalTasks(job.job_type):tasks.length;
+      var pct=total?Math.round(done/total*100):0;
+      await ia("erp_jobs","id=eq."+job.id,{pct_complete:pct,updated_at:new Date().toISOString()});
+      // Pack task 8 trigger
+      if(newDone&&t.phase==="PACK"&&t.task_sequence===8&&job&&wo){
+        await ia("work_orders","id=eq."+job.work_order_id,{status:"complete",updated_at:new Date().toISOString()});
+        setToast("WO "+wo.wo_number+" moved to Shipping queue");
+        setTimeout(function(){setToast("");},3500);
+      }
+      setRk(rk+1);
+    }catch(e){alert(e.message);}
+  }
+
+  async function clockIn(){
+    try{
+      var u=window.__SU_CURRENT_USER||{};
+      var row=await jr("time_entries",{job_id:job.id,work_order_id:job.work_order_id,user_id:u.id||"00000000-0000-0000-0000-000000000000",phase:phase,clocked_in_at:new Date().toISOString()});
+      setTimeEntry(row);
+    }catch(e){alert(e.message);}
+  }
+  async function clockOut(){
+    if(!timeEntry)return;
+    try{
+      var now=new Date().toISOString();
+      var dur=Math.round((Date.now()-new Date(timeEntry.clocked_in_at).getTime())/60000);
+      await ia("time_entries","id=eq."+timeEntry.id,{clocked_out_at:now,duration_minutes:dur});
+      setTimeEntry(null);
+    }catch(e){alert(e.message);}
+  }
+
+  if(!job)return n.jsx("div",{className:"p-8 text-sm text-muted-foreground",children:"Loading…"});
+
+  var matLabel=(__ERP_MATERIAL_OPTS.find(function(m){return m.value===job.material_type;})||{}).label||job.material_type;
+  var phaseTasks=tasks.filter(function(t){return t.phase===phase;});
+  var phases=job.job_type==="pull_and_ship"?["PREP","PACK"]:["PREP","EXPAND","PACK"];
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsxs("div",{className:"px-6 py-3 border-b border-border flex items-center gap-3 shrink-0 flex-wrap",children:[
+      n.jsx("button",{onClick:function(){props.onBack();},className:"text-muted-foreground hover:text-foreground text-sm",children:"← Back"}),
+      n.jsx("h2",{className:"text-base font-semibold",children:"Job "+job.job_number}),
+      wo&&n.jsx("span",{className:"text-xs text-muted-foreground",children:"WO "+wo.wo_number+" · "+wo.customer_name}),
+      n.jsx("span",{className:"text-xs text-muted-foreground",children:"· "+matLabel+" · "+job.roll_diameter+" × "+job.roll_length+" · Qty "+job.quantity}),
+      wo&&n.jsx("span",{className:"text-xs text-muted-foreground",children:"· Ship "+__ERP_ymd(wo.scheduled_ship_date)}),
+      n.jsx("div",{className:"flex-1"}),
+      n.jsx("div",{className:"w-44",children:n.jsx(__ERP_ProgressBar,{pct:job.pct_complete})})
+    ]}),
+    n.jsx("div",{className:"px-6 border-b border-border flex items-center gap-0 shrink-0",children:phases.map(function(p){
+      return n.jsx("button",{onClick:function(){setPhase(p);},className:"px-4 py-2.5 text-xs font-bold uppercase tracking-wider border-b-2 "+(phase===p?"border-primary text-primary":"border-transparent text-muted-foreground hover:text-foreground"),children:p},p);
+    })}),
+    n.jsxs("div",{className:"flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-2 gap-0",children:[
+      n.jsxs("div",{className:"overflow-auto p-6 border-r border-border",children:[
+        n.jsxs("div",{className:"flex items-center justify-between mb-3",children:[
+          n.jsxs("h3",{className:"text-sm font-semibold",children:[phase," Checklist"]}),
+          timeEntry?n.jsx("button",{onClick:clockOut,className:"px-3 py-1 text-[11px] rounded bg-rose-500/15 text-rose-400 border border-rose-500/30",children:"Clock Out"}):
+          n.jsx("button",{onClick:clockIn,className:"px-3 py-1 text-[11px] rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30",children:"Clock In"})
+        ]}),
+        n.jsx("div",{className:"space-y-1.5",children:phaseTasks.map(function(t){
+          return n.jsxs("label",{className:"flex items-start gap-3 p-2 rounded hover:bg-muted/30 cursor-pointer",children:[
+            n.jsx("input",{type:"checkbox",checked:!!t.is_done,onChange:function(){toggleTask(t);},className:"h-4 w-4 mt-0.5"}),
+            n.jsxs("div",{className:"flex-1",children:[
+              n.jsxs("div",{className:(t.is_done?"text-muted-foreground line-through":"text-foreground")+" text-sm",children:[
+                n.jsx("span",{className:"text-muted-foreground mr-2",children:t.task_sequence+"."}),t.task_name,
+                t.has_photo&&n.jsx("span",{className:"ml-2 text-[10px] text-amber-400",children:"[photo]"})
+              ]}),
+              t.is_done&&t.done_at&&n.jsx("div",{className:"text-[10px] text-muted-foreground",children:"Done "+new Date(t.done_at).toLocaleString()})
+            ]})
+          ]},t.id);
+        })})
+      ]}),
+      n.jsx("div",{className:"overflow-auto p-6",children:
+        phase==="PREP"?n.jsx(__ERP_PrepPanel,{job:job,inv:inv}):
+        phase==="EXPAND"?n.jsx(__ERP_ExpandPanel,{job:job,actuals:actuals,onSave:function(){setRk(rk+1);}}):
+        n.jsx(__ERP_PackPanel,{job:job,onChange:function(){setRk(rk+1);}})
+      })
+    ]}),
+    toast&&n.jsx("div",{className:"fixed bottom-6 right-6 px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-lg text-sm shadow-lg",children:toast})
+  ]});
+}
+
+function __ERP_PrepPanel(props){
+  var inv=props.inv||{};var job=props.job;
+  return n.jsxs("div",{className:"space-y-3",children:[
+    n.jsx("h3",{className:"text-sm font-semibold mb-2",children:"Inventory Info"}),
+    n.jsxs("div",{className:"grid grid-cols-2 gap-3 text-xs",children:[
+      __ERP_readonly("Tube #",inv.tube_number||"—"),
+      __ERP_readonly("Location",inv.location||"—"),
+      __ERP_readonly("Previously Etched",inv.previously_etched?"Yes":"No"),
+      __ERP_readonly("Sleeve Diameter",job.sleeve_diameter||"—"),
+      __ERP_readonly("Initial Diameter",inv.initial_diameter||"—"),
+      __ERP_readonly("Current Length",inv.current_length||"—")
+    ]})
+  ]});
+}
+function __ERP_readonly(label,val){
+  return n.jsxs("div",{children:[
+    n.jsx("div",{className:"text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5",children:label}),
+    n.jsx("div",{className:"px-2.5 py-1.5 bg-muted/20 border border-border rounded text-foreground font-mono",children:val})
+  ]});
+}
+
+function __ERP_ExpandPanel(props){
+  var job=props.job;
+  var a=props.actuals||{};
+  var s=C.useState(a),f=s[0],setF=s[1];
+  var s2=C.useState(false),saving=s2[0],setSaving=s2[1];
+  C.useEffect(function(){setF(props.actuals||{});},[props.actuals]);
+  function upd(k,v){var o={};o[k]=v;setF(Object.assign({},f,o));}
+  async function save(){
+    setSaving(true);
+    try{
+      var body={
+        expansion_method:f.expansion_method||null,
+        hot_target_circ:nz(f.hot_target_circ),
+        hot_temp_over_215:!!f.hot_temp_over_215,
+        hot_steam_psi:nz(f.hot_steam_psi),
+        hot_avg_steam_psi:nz(f.hot_avg_steam_psi),
+        hot_steam_circ:nz(f.hot_steam_circ),
+        hot_air_cool_psi:nz(f.hot_air_cool_psi),
+        cool_steam_end_circ:nz(f.cool_steam_end_circ),
+        cool_middle_circ:nz(f.cool_middle_circ),
+        cool_drain_end_circ:nz(f.cool_drain_end_circ),
+        cool_actual_sleeve_length:nz(f.cool_actual_sleeve_length),
+        cool_usable_length:nz(f.cool_usable_length),
+        updated_at:new Date().toISOString()
+      };
+      if(f.id)await ia("expansion_actuals","id=eq."+f.id,body);
+      else{body.job_id=job.id;await jr("expansion_actuals",body);}
+      props.onSave();
+    }catch(e){alert(e.message);}finally{setSaving(false);}
+  }
+  function nz(v){return v===""||v===null||v===undefined?null:Number(v);}
+
+  return n.jsxs("div",{className:"space-y-4",children:[
+    n.jsxs("div",{children:[
+      n.jsx("h3",{className:"text-sm font-semibold mb-2",children:"Method & Targets"}),
+      __ERP_field("Expansion Method",n.jsxs("select",{value:f.expansion_method||"",onChange:function(e){upd("expansion_method",e.target.value);},className:__ERP_inputCls,children:[n.jsx("option",{value:"",children:"— select —"}),n.jsx("option",{value:"type_2_no_spring",children:"Type 2 - no spring"}),n.jsx("option",{value:"type_1",children:"Type 1"}),n.jsx("option",{value:"type_2_spring",children:"Type 2 - spring"})]})),
+      n.jsxs("div",{className:"grid grid-cols-2 gap-2 mt-2",children:[
+        __ERP_readonly("Roll Circ",job.roll_circumference||"—"),
+        __ERP_readonly("Min Circ",job.min_circumference||"—"),
+        __ERP_readonly("Max Circ",job.max_circumference||"—"),
+        __ERP_readonly("Sleeve Length",job.sleeve_length||"—")
+      ]})
+    ]}),
+    n.jsxs("div",{children:[
+      n.jsx("h3",{className:"text-sm font-semibold mb-2",children:"Hot Actuals"}),
+      n.jsxs("div",{className:"grid grid-cols-2 gap-2",children:[
+        __ERP_field("Target Circ",n.jsx("input",{type:"number",step:"0.0001",value:f.hot_target_circ||"",onChange:function(e){upd("hot_target_circ",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Steam PSI",n.jsx("input",{type:"number",step:"0.01",value:f.hot_steam_psi||"",onChange:function(e){upd("hot_steam_psi",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Avg Steam PSI",n.jsx("input",{type:"number",step:"0.01",value:f.hot_avg_steam_psi||"",onChange:function(e){upd("hot_avg_steam_psi",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Steam Circ",n.jsx("input",{type:"number",step:"0.0001",value:f.hot_steam_circ||"",onChange:function(e){upd("hot_steam_circ",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Air Cool PSI",n.jsx("input",{type:"number",step:"0.01",value:f.hot_air_cool_psi||"",onChange:function(e){upd("hot_air_cool_psi",e.target.value);},className:__ERP_inputCls})),
+        n.jsxs("label",{className:"flex items-center gap-2 text-xs mt-5",children:[
+          n.jsx("input",{type:"checkbox",checked:!!f.hot_temp_over_215,onChange:function(e){upd("hot_temp_over_215",e.target.checked);},className:"h-4 w-4"}),
+          "Temp >215°F"
+        ]})
+      ]})
+    ]}),
+    n.jsxs("div",{children:[
+      n.jsx("h3",{className:"text-sm font-semibold mb-2",children:"Cool Actuals"}),
+      n.jsxs("div",{className:"grid grid-cols-2 gap-2",children:[
+        __ERP_field("Steam End Circ",n.jsx("input",{type:"number",step:"0.0001",value:f.cool_steam_end_circ||"",onChange:function(e){upd("cool_steam_end_circ",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Middle Circ",n.jsx("input",{type:"number",step:"0.0001",value:f.cool_middle_circ||"",onChange:function(e){upd("cool_middle_circ",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Drain End Circ",n.jsx("input",{type:"number",step:"0.0001",value:f.cool_drain_end_circ||"",onChange:function(e){upd("cool_drain_end_circ",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Actual Sleeve Length",n.jsx("input",{type:"number",step:"0.001",value:f.cool_actual_sleeve_length||"",onChange:function(e){upd("cool_actual_sleeve_length",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Usable Length",n.jsx("input",{type:"number",step:"0.001",value:f.cool_usable_length||"",onChange:function(e){upd("cool_usable_length",e.target.value);},className:__ERP_inputCls}))
+      ]})
+    ]}),
+    n.jsx("button",{onClick:save,disabled:saving,className:"px-4 py-1.5 text-xs bg-primary text-primary-foreground rounded disabled:opacity-50",children:saving?"Saving…":"Save Actuals"})
+  ]});
+}
+
+function __ERP_PackPanel(props){
+  var job=props.job;
+  var s=C.useState({
+    adhesive_type:job.adhesive_type||"2009",
+    adhesive_vol_part_a:job.adhesive_vol_part_a||"",
+    adhesive_vol_part_b:job.adhesive_vol_part_b||"",
+    add_adhesive_vol_part_a:job.add_adhesive_vol_part_a||"",
+    add_adhesive_vol_part_b:job.add_adhesive_vol_part_b||"",
+    tube_weight:job.tube_weight||"",
+    wooden_end_caps:!!job.wooden_end_caps,
+    qa_qc_pending:!!job.qa_qc_pending
+  }),f=s[0],setF=s[1];
+  var s2=C.useState(false),saving=s2[0],setSaving=s2[1];
+  var s3=C.useState(false),showReinv=s3[0],setShowReinv=s3[1];
+  function upd(k,v){var o={};o[k]=v;setF(Object.assign({},f,o));}
+  function nz(v){return v===""||v===null||v===undefined?null:Number(v);}
+  async function save(){
+    setSaving(true);
+    try{
+      await ia("erp_jobs","id=eq."+job.id,{
+        adhesive_type:f.adhesive_type||null,
+        adhesive_vol_part_a:nz(f.adhesive_vol_part_a),
+        adhesive_vol_part_b:nz(f.adhesive_vol_part_b),
+        add_adhesive_vol_part_a:nz(f.add_adhesive_vol_part_a),
+        add_adhesive_vol_part_b:nz(f.add_adhesive_vol_part_b),
+        tube_weight:nz(f.tube_weight),
+        wooden_end_caps:!!f.wooden_end_caps,
+        qa_qc_pending:!!f.qa_qc_pending,
+        updated_at:new Date().toISOString()
+      });
+      props.onChange();
+    }catch(e){alert(e.message);}finally{setSaving(false);}
+  }
+  var serials=[];for(var i=1;i<=(job.quantity||1);i++)serials.push(job.job_number+":"+i);
+
+  return n.jsxs("div",{className:"space-y-3",children:[
+    __ERP_field("Adhesive Type",n.jsx("input",{value:f.adhesive_type,onChange:function(e){upd("adhesive_type",e.target.value);},className:__ERP_inputCls})),
+    n.jsxs("div",{className:"grid grid-cols-2 gap-2",children:[
+      __ERP_field("Adhesive Vol Part A (oz)",n.jsx("input",{type:"number",step:"0.01",value:f.adhesive_vol_part_a,onChange:function(e){upd("adhesive_vol_part_a",e.target.value);},className:__ERP_inputCls})),
+      __ERP_field("Part B (oz)",n.jsx("input",{type:"number",step:"0.01",value:f.adhesive_vol_part_b,onChange:function(e){upd("adhesive_vol_part_b",e.target.value);},className:__ERP_inputCls})),
+      __ERP_field("Add'l A (oz)",n.jsx("input",{type:"number",step:"0.01",value:f.add_adhesive_vol_part_a,onChange:function(e){upd("add_adhesive_vol_part_a",e.target.value);},className:__ERP_inputCls})),
+      __ERP_field("Add'l B (oz)",n.jsx("input",{type:"number",step:"0.01",value:f.add_adhesive_vol_part_b,onChange:function(e){upd("add_adhesive_vol_part_b",e.target.value);},className:__ERP_inputCls}))
+    ]}),
+    __ERP_field("Tube Weight",n.jsx("input",{type:"number",step:"0.0001",value:f.tube_weight,onChange:function(e){upd("tube_weight",e.target.value);},className:__ERP_inputCls})),
+    n.jsxs("div",{children:[
+      n.jsx("label",{className:__ERP_lblCls,children:"Serial #s"}),
+      n.jsx("div",{className:"px-2.5 py-1.5 bg-muted/20 border border-border rounded text-foreground font-mono text-xs",children:serials.join(", ")})
+    ]}),
+    n.jsxs("label",{className:"flex items-center gap-2 text-sm",children:[
+      n.jsx("input",{type:"checkbox",checked:!!f.wooden_end_caps,onChange:function(e){upd("wooden_end_caps",e.target.checked);},className:"h-4 w-4"}),
+      "Wooden End Caps"
+    ]}),
+    n.jsxs("label",{className:"flex items-center gap-2 text-sm",children:[
+      n.jsx("input",{type:"checkbox",checked:!!f.qa_qc_pending,onChange:function(e){upd("qa_qc_pending",e.target.checked);},className:"h-4 w-4"}),
+      "QA/QC Pending"
+    ]}),
+    n.jsxs("div",{className:"flex items-center gap-2",children:[
+      n.jsx("button",{onClick:save,disabled:saving,className:"px-4 py-1.5 text-xs bg-primary text-primary-foreground rounded disabled:opacity-50",children:saving?"Saving…":"Save"}),
+      n.jsx("button",{onClick:function(){setShowReinv(true);},className:"px-3 py-1.5 text-xs rounded border border-border",children:"Re-inventory remnant"})
+    ]}),
+    showReinv&&n.jsx(__ERP_ReinvModal,{job:job,onClose:function(){setShowReinv(false);},onDone:function(){setShowReinv(false);props.onChange();}})
+  ]});
+}
+
+function __ERP_ReinvModal(props){
+  var job=props.job;
+  var s=C.useState({tube_number:"",current_length:"",location:""}),f=s[0],setF=s[1];
+  var s2=C.useState(false),saving=s2[0],setSaving=s2[1];
+  function upd(k,v){var o={};o[k]=v;setF(Object.assign({},f,o));}
+  async function save(){
+    setSaving(true);
+    try{
+      await jr("tube_inventory",{
+        tube_number:f.tube_number||("REM-"+job.job_number),
+        current_length:f.current_length===""?null:Number(f.current_length),
+        location:f.location||null,
+        material_type:job.material_type,
+        availability:"available",
+        previously_etched:!!job.etching_required
+      });
+      props.onDone();
+    }catch(e){alert(e.message);setSaving(false);}
+  }
+  return n.jsx("div",{className:"fixed inset-0 z-50 bg-black/60 flex items-start justify-center pt-12",onClick:function(){props.onClose();},children:
+    n.jsxs("div",{onClick:function(e){e.stopPropagation();},className:"bg-card border border-border rounded-xl w-full max-w-md p-6",children:[
+      n.jsx("h3",{className:"text-base font-semibold mb-4",children:"Re-inventory Remnant"}),
+      n.jsxs("div",{className:"space-y-3",children:[
+        __ERP_field("Tube # (optional)",n.jsx("input",{value:f.tube_number,onChange:function(e){upd("tube_number",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Remaining Length (in)",n.jsx("input",{type:"number",step:"0.001",value:f.current_length,onChange:function(e){upd("current_length",e.target.value);},className:__ERP_inputCls})),
+        __ERP_field("Location",n.jsx("input",{value:f.location,onChange:function(e){upd("location",e.target.value);},className:__ERP_inputCls}))
+      ]}),
+      n.jsxs("div",{className:"flex justify-end gap-2 mt-5",children:[
+        n.jsx("button",{onClick:function(){props.onClose();},className:"px-3 py-1.5 text-xs rounded border border-border",children:"Cancel"}),
+        n.jsx("button",{onClick:save,disabled:saving,className:"px-3 py-1.5 text-xs rounded bg-primary text-primary-foreground disabled:opacity-50",children:saving?"Saving…":"Create"})
+      ]})
+    ]})
+  });
+}
+
+/* ============================================================
+   Woodshop Tab
+   ============================================================ */
+function __ERP_WoodshopTab(){
+  var s=C.useState([]),items=s[0],setItems=s[1];
+  var s2=C.useState(true),loading=s2[0],setLoading=s2[1];
+  var s3=C.useState(0),rk=s3[0],setRk=s3[1];
+  var s4=C.useState({}),wos=s4[0],setWos=s4[1];
+
+  C.useEffect(function(){
+    setLoading(true);
+    Ct("woodshop_items","select=*&order=created_at.desc&limit=200").then(function(r){
+      setItems(Array.isArray(r)?r:[]);
+      var ids=Array.from(new Set((r||[]).map(function(x){return x.work_order_id;}))).filter(Boolean);
+      if(ids.length){Ct("work_orders","id=in.("+ids.join(",")+")&select=id,wo_number,customer_name").then(function(wr){var m={};(wr||[]).forEach(function(w){m[w.id]=w;});setWos(m);});}
+    }).catch(function(){setItems([]);}).finally(function(){setLoading(false);});
+  },[rk]);
+
+  async function mark(id,status){try{await ia("woodshop_items","id=eq."+id,{status:status,completed_at:status==="complete"?new Date().toISOString():null});setRk(rk+1);}catch(e){alert(e.message);}}
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsx("div",{className:"px-6 py-4 border-b border-border shrink-0",children:n.jsx("h2",{className:"text-base font-semibold",children:"Woodshop Queue"})}),
+    n.jsx("div",{className:"flex-1 overflow-auto",children:
+      loading?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"Loading…"}):
+      items.length===0?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"No woodshop items in queue."}):
+      n.jsxs("table",{className:"w-full text-sm",children:[
+        n.jsx("thead",{className:"bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground",children:n.jsxs("tr",{children:[
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"WO #"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Customer"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Item Type"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Status"}),
+          n.jsx("th",{className:"text-right px-4 py-2.5",children:""})
+        ]})}),
+        n.jsx("tbody",{children:items.map(function(it){
+          var wo=wos[it.work_order_id]||{};
+          return n.jsxs("tr",{className:"border-b border-border/50 hover:bg-muted/20",children:[
+            n.jsx("td",{className:"px-4 py-2 font-semibold",children:wo.wo_number||"—"}),
+            n.jsx("td",{className:"px-4 py-2",children:wo.customer_name||"—"}),
+            n.jsx("td",{className:"px-4 py-2",children:String(it.item_type).replace(/_/g," ")}),
+            n.jsx("td",{className:"px-4 py-2",children:n.jsx(__ERP_StatusBadge,{status:it.status==="complete"?"complete":"open"})}),
+            n.jsx("td",{className:"px-4 py-2 text-right",children:
+              it.status==="complete"?n.jsx("span",{className:"text-[11px] text-muted-foreground",children:"Done"}):
+              n.jsx("button",{onClick:function(){mark(it.id,"complete");},className:"text-[11px] text-primary hover:underline",children:"Mark complete"})
+            })
+          ]},it.id);
+        })})
+      ])
+    })
+  ]});
+}
+
+/* ============================================================
+   Shipping Tab
+   ============================================================ */
+function __ERP_ShippingTab(){
+  var s=C.useState([]),wos=s[0],setWos=s[1];
+  var s2=C.useState(true),loading=s2[0],setLoading=s2[1];
+  var s3=C.useState(0),rk=s3[0],setRk=s3[1];
+
+  C.useEffect(function(){
+    setLoading(true);
+    Ct("work_orders","status=in.(complete,shipped)&select=*&order=scheduled_ship_date.asc&limit=200").then(function(r){setWos(Array.isArray(r)?r:[]);}).catch(function(){setWos([]);}).finally(function(){setLoading(false);});
+  },[rk]);
+
+  async function ship(w){try{await ia("work_orders","id=eq."+w.id,{status:"shipped",updated_at:new Date().toISOString()});setRk(rk+1);}catch(e){alert(e.message);}}
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsx("div",{className:"px-6 py-4 border-b border-border shrink-0",children:n.jsx("h2",{className:"text-base font-semibold",children:"Shipping Queue"})}),
+    n.jsx("div",{className:"flex-1 overflow-auto",children:
+      loading?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"Loading…"}):
+      wos.length===0?n.jsx("div",{className:"p-8 text-center text-sm text-muted-foreground",children:"No shipments queued."}):
+      n.jsxs("table",{className:"w-full text-sm",children:[
+        n.jsx("thead",{className:"bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground",children:n.jsxs("tr",{children:[
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"WO #"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Customer"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Ship Date"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Carrier"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Tracking #"}),
+          n.jsx("th",{className:"text-left px-4 py-2.5",children:"Status"}),
+          n.jsx("th",{className:"text-right px-4 py-2.5",children:""})
+        ]})}),
+        n.jsx("tbody",{children:wos.map(function(w){
+          return n.jsxs("tr",{className:"border-b border-border/50 hover:bg-muted/20",children:[
+            n.jsx("td",{className:"px-4 py-2 font-semibold",children:w.wo_number}),
+            n.jsx("td",{className:"px-4 py-2",children:w.customer_name}),
+            n.jsx("td",{className:"px-4 py-2",children:__ERP_ymd(w.scheduled_ship_date)}),
+            n.jsx("td",{className:"px-4 py-2",children:w.carrier||"—"}),
+            n.jsx("td",{className:"px-4 py-2 font-mono text-xs",children:w.tracking_number||"—"}),
+            n.jsx("td",{className:"px-4 py-2",children:n.jsx(__ERP_StatusBadge,{status:w.status})}),
+            n.jsx("td",{className:"px-4 py-2 text-right",children:
+              w.status==="shipped"?n.jsx("span",{className:"text-[11px] text-muted-foreground",children:"Shipped"}):
+              n.jsx("button",{onClick:function(){ship(w);},className:"text-[11px] text-primary hover:underline",children:"Mark shipped"})
+            })
+          ]},w.id);
+        })})
+      ])
+    })
+  ]});
+}
+
+/* ============================================================
+   Revenue Tab
+   ============================================================ */
+function __ERP_RevenueTab(){
+  var s=C.useState([]),wos=s[0],setWos=s[1];
+  var s2=C.useState(true),loading=s2[0],setLoading=s2[1];
+  var s3=C.useState("all"),filter=s3[0],setFilter=s3[1];
+
+  C.useEffect(function(){
+    setLoading(true);
+    Ct("work_orders","select=*&order=scheduled_ship_date.desc&limit=500").then(function(r){setWos(Array.isArray(r)?r:[]);}).catch(function(){setWos([]);}).finally(function(){setLoading(false);});
+  },[]);
+
+  var now=new Date();
+  var ym=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+  var year=now.getFullYear();
+  var openCnt=0,openSum=0,shipMoCnt=0,shipMoSum=0,shipYtdSum=0;
+  wos.forEach(function(w){
+    var v=Number(w.total_value)||0;
+    if(w.status==="open"||w.status==="in_production"){openCnt++;openSum+=v;}
+    if(w.status==="shipped"&&w.scheduled_ship_date){
+      if(w.scheduled_ship_date.startsWith(ym)){shipMoCnt++;shipMoSum+=v;}
+      if(w.scheduled_ship_date.startsWith(String(year)))shipYtdSum+=v;
+    }
+  });
+  var filtered=wos.filter(function(w){if(filter==="all")return true;return w.status===filter;});
+
+  return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden",children:[
+    n.jsx("div",{className:"px-6 py-4 border-b border-border shrink-0",children:n.jsx("h2",{className:"text-base font-semibold",children:"Revenue"})}),
+    n.jsxs("div",{className:"flex-1 overflow-auto p-6 space-y-6",children:[
+      n.jsxs("div",{className:"grid grid-cols-1 md:grid-cols-3 gap-4",children:[
+        __ERP_revCard("Total Open Orders",openCnt+" orders",__ERP_money(openSum),"blue"),
+        __ERP_revCard("Shipped This Month",shipMoCnt+" orders",__ERP_money(shipMoSum),"emerald"),
+        __ERP_revCard("Shipped YTD","",__ERP_money(shipYtdSum),"violet")
+      ]}),
+      n.jsxs("div",{children:[
+        n.jsxs("div",{className:"flex items-center gap-2 mb-2",children:[
+          n.jsx("h3",{className:"text-sm font-semibold",children:"Work Orders"}),
+          n.jsx("div",{className:"flex-1"}),
+          [["all","All"],["open","Open"],["in_production","In Production"],["shipped","Shipped"]].map(function(p){
+            return n.jsx("button",{onClick:function(){setFilter(p[0]);},className:"px-2.5 py-1 text-[11px] rounded "+(filter===p[0]?"bg-primary/15 text-primary":"text-muted-foreground hover:text-foreground"),children:p[1]},p[0]);
+          })
+        ]}),
+        loading?n.jsx("div",{className:"text-sm text-muted-foreground",children:"Loading…"}):
+        n.jsxs("table",{className:"w-full text-sm",children:[
+          n.jsx("thead",{className:"bg-muted/30 text-[10px] uppercase tracking-wider text-muted-foreground",children:n.jsxs("tr",{children:[
+            n.jsx("th",{className:"text-left px-3 py-2",children:"WO #"}),
+            n.jsx("th",{className:"text-left px-3 py-2",children:"Customer"}),
+            n.jsx("th",{className:"text-left px-3 py-2",children:"Ship Date"}),
+            n.jsx("th",{className:"text-left px-3 py-2",children:"Status"}),
+            n.jsx("th",{className:"text-right px-3 py-2",children:"Value"})
+          ]})}),
+          n.jsx("tbody",{children:filtered.map(function(w){
+            return n.jsxs("tr",{className:"border-b border-border/50",children:[
+              n.jsx("td",{className:"px-3 py-2 font-semibold",children:w.wo_number}),
+              n.jsx("td",{className:"px-3 py-2",children:w.customer_name}),
+              n.jsx("td",{className:"px-3 py-2",children:__ERP_ymd(w.scheduled_ship_date)}),
+              n.jsx("td",{className:"px-3 py-2",children:n.jsx(__ERP_StatusBadge,{status:w.status})}),
+              n.jsx("td",{className:"px-3 py-2 text-right font-mono",children:__ERP_money(w.total_value)})
+            ]},w.id);
+          })})
+        ])
+      ])
+    ]})
+  ]});
+}
+function __ERP_revCard(label,sub,val,color){
+  var cmap={blue:"text-blue-400",emerald:"text-emerald-400",violet:"text-violet-400"};
+  return n.jsxs("div",{className:"rounded-lg border border-border bg-card p-4",children:[
+    n.jsx("div",{className:"text-[11px] uppercase tracking-wider text-muted-foreground mb-2",children:label}),
+    n.jsx("div",{className:"text-2xl font-bold "+(cmap[color]||"text-foreground"),children:val}),
+    sub&&n.jsx("div",{className:"text-xs text-muted-foreground mt-1",children:sub})
+  ]});
+}
+
+function Hce(){const[e,t]=C.useState("work_orders");return n.jsxs("div",{className:"flex flex-col h-full overflow-hidden bg-background",children:[n.jsxs("div",{className:"px-8 py-5 border-b border-border flex items-center gap-4 shrink-0",children:[n.jsx(qo,{href:"/ops",children:n.jsx("a",{className:"text-muted-foreground hover:text-foreground transition-colors",children:n.jsx(cg,{className:"w-5 h-5"})})}),n.jsxs("div",{className:"flex-1",children:[n.jsxs("h1",{className:"text-lg font-semibold text-foreground flex items-center gap-2",children:[n.jsx(dg,{className:"w-5 h-5 text-slate-400"}),"ERP / Execution"]}),n.jsx("p",{className:"text-xs text-muted-foreground mt-0.5",children:"Production planning · Quotes · Pricing rates"})]}),n.jsxs("div",{className:"flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-400",children:[n.jsx("span",{className:"text-[10px] font-bold uppercase tracking-widest",children:"Beta"}),n.jsx("span",{className:"text-[11px] font-medium",children:"Production Board"})]})]}),n.jsx("div",{className:"px-8 border-b border-border flex items-center gap-0 shrink-0",children:Wce.map(({key:r,label:a,icon:i})=>n.jsxs("button",{onClick:()=>t(r),className:`flex items-center gap-2 px-5 py-3 text-sm font-medium border-b-2 transition-colors ${e===r?"border-primary text-primary":"border-transparent text-muted-foreground hover:text-foreground"}`,children:[n.jsx(i,{className:"w-3.5 h-3.5"}),a]},r))}),n.jsxs("div",{className:"flex-1 overflow-hidden",children:[e==="work_orders"&&n.jsx(__ERP_WorkOrdersTab,{}),e==="job_dashboard"&&n.jsx(__ERP_JobDashboardTab,{}),e==="woodshop"&&n.jsx(__ERP_WoodshopTab,{}),e==="shipping"&&n.jsx(__ERP_ShippingTab,{}),e==="revenue"&&n.jsx(__ERP_RevenueTab,{}),e==="jobs"&&n.jsx(zce,{}),e==="quotes"&&n.jsx(qce,{}),e==="pricing"&&n.jsx(Bce,{})]})]})}function Gce(){return n.jsxs("div",{className:"flex flex-col gap-6 p-6 max-w-5xl mx-auto",children:[n.jsxs("div",{className:"flex items-center justify-between",children:[n.jsx("div",{className:"flex items-center gap-3",children:n.jsx(qo,{href:"/ops",children:n.jsxs("a",{className:"flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors",children:[n.jsx(cg,{className:"w-4 h-4"})," Operations"]})})}),n.jsx(TN,{className:"bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 text-[10px] uppercase tracking-widest px-2",children:"Beta"})]}),n.jsxs("div",{className:"flex items-center gap-3",children:[n.jsx("div",{className:"w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center",children:n.jsx(Uu,{className:"w-5 h-5 text-primary"})}),n.jsxs("div",{children:[n.jsx("h1",{className:"text-xl font-bold tracking-tight",children:"SIOP"}),n.jsx("p",{className:"text-sm text-muted-foreground",children:"Sales, Inventory & Operations Planning"})]})]}),n.jsxs("div",{className:"rounded-xl border border-border bg-card p-5 flex items-start gap-4",children:[n.jsx(Si,{className:"w-5 h-5 text-amber-400 shrink-0 mt-0.5"}),n.jsxs("div",{children:[n.jsx("p",{className:"text-sm font-semibold mb-1",children:"Module in development"}),n.jsx("p",{className:"text-sm text-muted-foreground leading-relaxed",children:"The SIOP module will integrate your sales pipeline data with production capacity, inventory levels, and procurement scheduling to produce a synchronized rolling plan. This beta stub is a placeholder — full functionality is coming soon."})]})]}),n.jsx("div",{className:"grid grid-cols-2 gap-4 sm:grid-cols-4",children:[{icon:ao,label:"Demand Planning",desc:"Rolling 12-week forecast from BD pipeline"},{icon:Ic,label:"Inventory Sync",desc:"Raw material & finished goods alignment"},{icon:gh,label:"Capacity Planning",desc:"Production floor load vs. available hours"},{icon:Ad,label:"S&OP Dashboard",desc:"Executive-level plan vs. actual view"}].map(({icon:e,label:t,desc:r})=>n.jsxs("div",{className:"rounded-xl border border-border bg-card p-4 opacity-60 select-none",children:[n.jsx("div",{className:"w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center mb-3",children:n.jsx(e,{className:"w-4 h-4 text-muted-foreground"})}),n.jsx("p",{className:"text-sm font-semibold mb-1",children:t}),n.jsx("p",{className:"text-xs text-muted-foreground leading-relaxed",children:r})]},t))}),n.jsxs("div",{className:"flex items-center gap-2 text-xs text-muted-foreground/60",children:[n.jsx(dg,{className:"w-3 h-3"}),n.jsx("span",{children:"Spectrum Universe · Operations Planning · v0.1-beta"})]})]})}const Kce=["mlippmann@spectrumadvanced.com","dkearney@spectrumadvanced.com","gsantinelli@spectrumadvanced.com"],Vce="mlippmann@spectrumadvanced.com";function Gm(e){return e.email===Vce||e.role==="super_admin"?"super_admin":e.role}function fD(){const e="ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";let t="";for(let r=0;r<10;r++)t+=e[Math.floor(Math.random()*e.length)];return"Sp!"+t}function Qce(e){return e.split(" ").map(t=>t[0]).join("").slice(0,2).toUpperCase()}function Yce(e){const t=["bg-blue-500/20 text-blue-400","bg-purple-500/20 text-purple-400","bg-teal-500/20 text-teal-400","bg-amber-500/20 text-amber-400","bg-rose-500/20 text-rose-400","bg-emerald-500/20 text-emerald-400"];let r=0;for(const a of e)r=r*31+a.charCodeAt(0)&65535;return t[r%t.length]}function Xce({onClose:e,onSuccess:t}){const[r,a]=C.useState({first_name:"",last_name:"",email:"",role:"user",phone_8x8:"",cell_phone:""}),[i,o]=C.useState(!1),[s,l]=C.useState(""),[d,u]=C.useState(null),[p,m]=C.useState(!1),g=C.useRef(fD());async function h(w){if(w.preventDefault(),!r.first_name||!r.last_name||!r.email){l("First name, last name and email are required.");return}o(!0),l("");try{await Hp("register_user",{p_first_name:r.first_name.trim(),p_last_name:r.last_name.trim(),p_email:r.email.trim().toLowerCase(),p_password:g.current,p_role:r.role,p_phone_8x8:r.phone_8x8||null,p_cell_phone:r.cell_phone||null}),u({email:r.email.trim().toLowerCase(),password:g.current,name:`${r.first_name.trim()} ${r.last_name.trim()}`}),t()}catch(j){l(j.message||"Failed to create user")}finally{o(!1)}}function y(){d&&(navigator.clipboard.writeText(`Email: ${d.email}
 Temp Password: ${d.password}
 
 Please log in at https://spectrum-universe.pages.dev`),m(!0),setTimeout(()=>m(!1),2e3))}const v=w=>j=>a(N=>({...N,[w]:j.target.value}));return n.jsx("div",{className:"fixed inset-0 z-50 flex items-center justify-center p-4",style:{background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)"},onClick:w=>{w.target===w.currentTarget&&e()},children:n.jsxs("div",{className:"w-full max-w-md rounded-xl border border-border bg-card shadow-2xl",children:[n.jsxs("div",{className:"flex items-center justify-between px-5 py-4 border-b border-border",children:[n.jsxs("div",{className:"flex items-center gap-2",children:[n.jsx(Kp,{className:"w-4 h-4 text-primary"}),n.jsx("h2",{className:"text-sm font-semibold text-foreground",children:"Invite Team Member"})]}),n.jsx("button",{onClick:e,className:"text-muted-foreground hover:text-foreground transition-colors",children:n.jsx(rr,{className:"w-4 h-4"})})]}),d?n.jsxs("div",{className:"p-5 space-y-4",children:[n.jsxs("div",{className:"flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20",children:[n.jsx(Ju,{className:"w-4 h-4 text-emerald-400 shrink-0"}),n.jsx("p",{className:"text-sm text-emerald-300 font-medium",children:"User created successfully"})]}),n.jsxs("div",{className:"rounded-lg border border-border bg-background/50 p-4 space-y-2",children:[n.jsx("p",{className:"text-xs text-muted-foreground uppercase tracking-wider font-semibold",children:"Share these credentials"}),n.jsxs("div",{className:"space-y-1.5",children:[n.jsxs("div",{className:"flex items-center gap-2",children:[n.jsx("span",{className:"text-xs text-muted-foreground w-28 shrink-0",children:"Email"}),n.jsx("span",{className:"text-xs text-foreground font-mono",children:d.email})]}),n.jsxs("div",{className:"flex items-center gap-2",children:[n.jsx("span",{className:"text-xs text-muted-foreground w-28 shrink-0",children:"Temp Password"}),n.jsx("span",{className:"text-xs text-foreground font-mono font-bold",children:d.password})]})]})]}),n.jsx("p",{className:"text-xs text-muted-foreground",children:"Share these credentials securely. The user can change their password after logging in."}),n.jsxs("div",{className:"flex flex-col gap-2",children:[n.jsxs("div",{className:"flex gap-2",children:[n.jsx("button",{onClick:y,className:"flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-all",style:{background:"rgba(40,150,175,0.15)",color:"#38d4ef",border:"1px solid rgba(40,150,175,0.25)"},children:p?n.jsxs(n.Fragment,{children:[n.jsx(Br,{className:"w-3.5 h-3.5"})," Copied!"]}):n.jsxs(n.Fragment,{children:[n.jsx(Gp,{className:"w-3.5 h-3.5"})," Copy Credentials"]})}),n.jsx("button",{onClick:e,className:"flex-1 py-2 rounded-lg text-xs font-medium bg-primary text-primary-foreground transition-opacity hover:opacity-90",children:"Done"})]}),d&&n.jsxs("a",{href:`mailto:${d.email}?subject=Welcome%20to%20Spectrum%20Universe&body=Hi%20${encodeURIComponent(d.name)}%2C%0D%0A%0D%0AYour%20Spectrum%20Universe%20account%20is%20ready.%20Here%20are%20your%20login%20credentials%3A%0D%0A%0D%0ALogin%20URL%3A%20https%3A%2F%2Fspectrum-universe.pages.dev%0D%0AEmail%3A%20${encodeURIComponent(d.email)}%0D%0ATemporary%20Password%3A%20${encodeURIComponent(d.password)}%0D%0A%0D%0APlease%20log%20in%20and%20change%20your%20password%20after%20your%20first%20sign%20in.%20Let%20me%20know%20if%20you%20run%20into%20any%20issues.%0D%0A%0D%0AMatt`,className:"w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium transition-all",style:{background:"rgba(99,102,241,0.12)",color:"#a5b4fc",border:"1px solid rgba(99,102,241,0.25)"},children:[n.jsx(Mn,{className:"w-3.5 h-3.5"})," Send Welcome Email"]})]})]}):n.jsxs("form",{onSubmit:h,className:"p-5 space-y-4",children:[n.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[n.jsxs("div",{children:[n.jsxs("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:["First Name ",n.jsx("span",{className:"text-red-400",children:"*"})]}),n.jsx("input",{value:r.first_name,onChange:v("first_name"),placeholder:"Jane",className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors"})]}),n.jsxs("div",{children:[n.jsxs("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:["Last Name ",n.jsx("span",{className:"text-red-400",children:"*"})]}),n.jsx("input",{value:r.last_name,onChange:v("last_name"),placeholder:"Smith",className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors"})]})]}),n.jsxs("div",{children:[n.jsxs("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:["Email ",n.jsx("span",{className:"text-red-400",children:"*"})]}),n.jsx("input",{type:"email",value:r.email,onChange:v("email"),placeholder:"jane.smith@spectrumadvanced.com",className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors"})]}),n.jsxs("div",{children:[n.jsx("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:"Role"}),n.jsxs("select",{value:r.role,onChange:v("role"),className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors",children:[n.jsx("option",{value:"user",children:"General User"}),n.jsx("option",{value:"admin",children:"Admin"}),n.jsx("option",{value:"super_admin",children:"Super Admin"})]})]}),n.jsxs("div",{className:"grid grid-cols-2 gap-3",children:[n.jsxs("div",{children:[n.jsxs("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:["8x8 Extension ",n.jsx("span",{className:"text-muted-foreground/50",children:"(optional)"})]}),n.jsx("input",{value:r.phone_8x8,onChange:v("phone_8x8"),placeholder:"x1234",className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors"})]}),n.jsxs("div",{children:[n.jsxs("label",{className:"block text-xs font-medium text-muted-foreground mb-1",children:["Cell ",n.jsx("span",{className:"text-muted-foreground/50",children:"(optional)"})]}),n.jsx("input",{value:r.cell_phone,onChange:v("cell_phone"),placeholder:"(410) 555-0100",className:"w-full rounded-lg px-3 py-2 text-sm bg-background border border-border text-foreground outline-none focus:border-primary/60 transition-colors"})]})]}),s&&n.jsx("p",{className:"text-xs text-red-400",children:s}),n.jsxs("div",{className:"flex gap-2 pt-1",children:[n.jsx("button",{type:"button",onClick:e,className:"flex-1 py-2 rounded-lg text-xs font-medium border border-border text-muted-foreground hover:text-foreground hover:bg-accent transition-colors",children:"Cancel"}),n.jsx("button",{type:"submit",disabled:i,className:"flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50",style:{background:"linear-gradient(135deg, #2896af, #174973)"},children:i?"Creating…":"Create & Show Password"})]})]})]})})}function Jce({onClose:e,onSuccess:t}){const[r,a]=C.useState(""),[i,o]=C.useState([]),[s,l]=C.useState(!1),[d,u]=C.useState([]),[p,m]=C.useState(!1),g=C.useRef(null);function h(N){const k=[];for(const O of N.split(`
