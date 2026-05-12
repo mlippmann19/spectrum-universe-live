@@ -301,6 +301,14 @@ Deno.serve(async (req: Request) => {
     spec_failure_description: payload?.spec_failure_description?.toString().trim() || null,
     spec_current_sleeve: payload?.spec_current_sleeve?.toString().trim() || null,
     spec_failure_frequency: payload?.spec_failure_frequency?.toString().trim() || null,
+    spec_budget: payload?.budget?.toString().trim() || null,
+    spec_spare_available: payload?.spare_available?.toString().trim() || null,
+    spec_nip_pressure: payload?.nip_pressure?.toString().trim() || null,
+    spec_surface_finish: payload?.surface_finish?.toString().trim() || null,
+    spec_abrasion_concern: payload?.abrasion_concern?.toString().trim() || null,
+    spec_static_concern: payload?.static_concern?.toString().trim() || null,
+    spec_install_preference: payload?.install_preference?.toString().trim() || null,
+    spec_training_interest: payload?.training_interest?.toString().trim() || null,
   };
 
   // Normalised payload for scoring (so aliases work cleanly)
