@@ -68,22 +68,30 @@ function buildCompanyName(name: string, city: string | null, state: string | nul
 }
 
 // ── MQL scoring ──────────────────────────────────────────────────────────────
-function scoreLead(payload: any): number {
+function scoreLead(payload: any): { score: number; tqlReady: boolean } {
   let score = 0;
-  if (payload.company || payload.company_name) score += 20;
+  // Tier 1
+  if (payload.first_name || payload.full_name) score += 10;
   if (payload.email) score += 20;
-  if (payload.phone) score += 15;
-  if (payload.title) score += 10;
-  if (payload.product_interest) score += 15;
-  if ((payload.message || "").length > 40) score += 10;
-  if (payload.city || payload.state) score += 5;
+  if (payload.company || payload.company_name) score += 20;
+  if (payload.phone) score += 5;
+  if (payload.title) score += 5;
+  // Tier 2 — MQL
+  if (payload.qual_issue_type) score += 15;
+  if (payload.qual_process_type) score += 10;
+  if (payload.qual_current_solution) score += 10;
+  if (payload.qual_urgency) score += 10;
+  if (payload.qual_buying_role) score += 5;
+  // Tier 3 — TQL
   const specFields = [
-    "roll_diameter", "face_length", "current_roller_material",
-    "environment", "operating_temperature", "failure_description",
+    "spec_roll_type","spec_roll_position","spec_diameter","spec_face_length",
+    "spec_roll_material","spec_substrate","spec_temperature","spec_line_speed",
+    "spec_environment","spec_failure_description","spec_current_sleeve","spec_failure_frequency"
   ];
-  const specsFilled = specFields.filter(f => payload[f]).length;
-  if (specsFilled >= 2) score += 5;
-  return score;
+  const specCount = specFields.filter(f => payload[f]).length;
+  score += specCount * 3;
+  const tqlReady = specCount >= 6;
+  return { score, tqlReady };
 }
 
 // ── Stage routing ────────────────────────────────────────────────────────────
@@ -91,8 +99,9 @@ function scoreLead(payload: any): number {
 // "connected" tier of the BD pipeline, and "mql" for marketing-qualified leads.
 function determineStage(formType: string, score: number): string {
   if (formType === "pdf_download") return "prospect";
-  if (score >= 60) return "mql";
-  return "contact";
+  if (score >= 55) return "mql";
+  if (score >= 30) return "contact";
+  return "prospect";
 }
 
 // ── Follow-up email drafting ─────────────────────────────────────────────────
@@ -127,7 +136,7 @@ The Fluoron Team`;
   }
 
   // Contact form
-  if (score >= 60) {
+  if (score >= 55) {
     const productLabel = (payload.product_interest && payload.product_interest.trim())
       ? payload.product_interest.trim()
       : "Sleeve Specification";
@@ -162,7 +171,7 @@ Spectrum Advanced / Fluoron`;
     return { subject, body };
   }
 
-  // Contact form, score < 60
+  // Contact form, score < 55
   const subject = "Re: Your Fluoron Inquiry";
   const missingQs: string[] = [];
   if (!(payload.company || payload.company_name)) missingQs.push("- What company are you with?");
@@ -273,16 +282,39 @@ Deno.serve(async (req: Request) => {
     ? payload.pdfs_requested.map((s: any) => String(s).trim()).filter((s: string) => s.length > 0)
     : [];
 
+  // ── Tier 2 / Tier 3 qualification fields (structured) ───────────────────────
+  const qualSpecFields = {
+    qual_issue_type: payload?.qual_issue_type?.toString().trim() || null,
+    qual_process_type: payload?.qual_process_type?.toString().trim() || null,
+    qual_current_solution: payload?.qual_current_solution?.toString().trim() || null,
+    qual_buying_role: payload?.qual_buying_role?.toString().trim() || null,
+    qual_urgency: payload?.qual_urgency?.toString().trim() || null,
+    spec_roll_type: payload?.spec_roll_type?.toString().trim() || null,
+    spec_roll_position: payload?.spec_roll_position?.toString().trim() || null,
+    spec_diameter: payload?.spec_diameter?.toString().trim() || null,
+    spec_face_length: payload?.spec_face_length?.toString().trim() || null,
+    spec_roll_material: payload?.spec_roll_material?.toString().trim() || null,
+    spec_substrate: payload?.spec_substrate?.toString().trim() || null,
+    spec_temperature: payload?.spec_temperature?.toString().trim() || null,
+    spec_line_speed: payload?.spec_line_speed?.toString().trim() || null,
+    spec_environment: payload?.spec_environment?.toString().trim() || null,
+    spec_failure_description: payload?.spec_failure_description?.toString().trim() || null,
+    spec_current_sleeve: payload?.spec_current_sleeve?.toString().trim() || null,
+    spec_failure_frequency: payload?.spec_failure_frequency?.toString().trim() || null,
+  };
+
   // Normalised payload for scoring (so aliases work cleanly)
   const scoringPayload = {
     ...payload,
     company: rawCompany,
     company_name: rawCompany,
+    first_name, last_name, full_name,
     email, phone, title, product_interest, message, city, state,
     roll_diameter, face_length, current_roller_material,
     environment, operating_temperature, failure_description,
+    ...qualSpecFields,
   };
-  const mqlScore = scoreLead(scoringPayload);
+  const { score: mqlScore, tqlReady } = scoreLead(scoringPayload);
   const dealStage = determineStage(form_type, mqlScore);
 
   const personName = `${first_name} ${last_name}`.trim();
@@ -432,6 +464,20 @@ Deno.serve(async (req: Request) => {
       if ((stageRank[dealStage] ?? 0) > (stageRank[existingDeal.stage] ?? 0)) {
         updates.stage = dealStage;
       }
+      // Overwrite null qual_*/spec_* fields with values from new submission
+      const { data: existingFull } = await supabase.from("deals")
+        .select(Object.keys(qualSpecFields).concat(["tql_ready"]).join(","))
+        .eq("id", dealId).maybeSingle();
+      if (existingFull) {
+        for (const [key, val] of Object.entries(qualSpecFields)) {
+          if (val && !(existingFull as any)[key]) {
+            updates[key] = val;
+          }
+        }
+        if (tqlReady && !(existingFull as any).tql_ready) {
+          updates.tql_ready = true;
+        }
+      }
       if (Object.keys(updates).length) {
         await supabase.from("deals").update(updates).eq("id", dealId);
       }
@@ -454,6 +500,8 @@ Deno.serve(async (req: Request) => {
         is_new_lead: true,
         lead_source: "website",
         notes: dealNotes,
+        ...qualSpecFields,
+        tql_ready: tqlReady,
       })
       .select("id").single();
     if (dErr) {
