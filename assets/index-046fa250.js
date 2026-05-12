@@ -855,7 +855,7 @@ function __ERP_WorkOrdersTab(){
             n.jsx("td",{className:"px-4 py-2.5 text-right font-mono text-foreground",children:__ERP_money(w.total_value)})
           ]},w.id);
         })})
-      ])
+      ]})
     }),
     showNew&&n.jsx(__ERP_NewWoModal,{onClose:function(){setShowNew(false);},onCreated:function(id){setShowNew(false);setRefreshKey(refreshKey+1);setSelectedWoId(id);}})
   ]});
@@ -1029,7 +1029,7 @@ function __ERP_WoJobsTab(props){
           ]})
         ]},j.id);
       })})
-    ])
+    ]})
   ]});
 }
 
@@ -1602,7 +1602,7 @@ function __ERP_WoodshopTab(){
             })
           ]},it.id);
         })})
-      ])
+      ]})
     })
   ]});
 }
@@ -1651,7 +1651,7 @@ function __ERP_ShippingTab(){
             })
           ]},w.id);
         })})
-      ])
+      ]})
     })
   ]});
 }
@@ -1717,8 +1717,8 @@ function __ERP_RevenueTab(){
               n.jsx("td",{className:"px-3 py-2 text-right font-mono",children:__ERP_money(w.total_value)})
             ]},w.id);
           })})
-        ])
-      ])
+        ]})
+      ]})
     ]})
   ]});
 }
