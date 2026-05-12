@@ -512,9 +512,9 @@ Deno.serve(async (req: Request) => {
     console.log("✓ Deal created:", dealTitle, "stage=", dealStage);
   }
 
-  // ── Activity: drafted follow-up email ───────────────────────────────────────
+  // ── Activity: follow-up email (sent via Resend, or drafted if unavailable) ──
   if (dealId) {
-    const { subject: emailSubject, body: emailBody } = draftFollowUpEmail({
+    const { subject: emailSubject, body: emailBodyRaw } = draftFollowUpEmail({
       formType: form_type,
       firstName: first_name,
       score: mqlScore,
@@ -522,16 +522,55 @@ Deno.serve(async (req: Request) => {
       ownerName: crmOwner,
     });
 
+    // Strip the leading "Subject: ...\n\n" line — that's for activity display only.
+    const emailBody = emailBodyRaw.replace(/^Subject:[^\n]*\n\n?/, "");
+
+    let emailSent = false;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.warn("RESEND_API_KEY missing — skipping email send, logging draft only.");
+    } else {
+      try {
+        const resendResp = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "Fluoron <info@fluoron.com>",
+            to: [email],
+            subject: emailSubject,
+            text: emailBody,
+          }),
+        });
+        if (resendResp.ok) {
+          const result = await resendResp.json().catch(() => ({}));
+          emailSent = true;
+          console.log("✓ Resend email sent:", result?.id ?? "(no id)");
+        } else {
+          const errBody = await resendResp.text().catch(() => "");
+          console.error("Resend send failed:", resendResp.status, errBody);
+        }
+      } catch (err) {
+        console.error("Resend send threw:", err);
+      }
+    }
+
+    const activitySubject = emailSent
+      ? "Follow-up email sent"
+      : `Draft follow-up email — ${form_type}`;
+
     await supabase.from("activities").insert({
       deal_id: dealId, company_id: companyId, contact_id: contactId,
       type: "email",
-      subject: `Draft follow-up email — ${form_type}`,
+      subject: activitySubject,
       body: emailBody,
       logged_by: crmOwner,
       occurred_at: new Date().toISOString(),
       assigned_to: crmOwner,
     });
-    console.log("✓ Activity logged (draft email):", emailSubject);
+    console.log(`✓ Activity logged (${emailSent ? "sent" : "draft"}):`, emailSubject);
   }
 
   return jsonResponse({
