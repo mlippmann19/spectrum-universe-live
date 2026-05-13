@@ -399,29 +399,34 @@ Deno.serve(async (req: Request) => {
       webInquiryId = wiq.id;
       console.log("✓ web_inquiries record created:", webInquiryId);
 
-      // Fire send-inquiry-reply to deliver via Brevo immediately
-      try {
-        const sendResp = await fetch(
-          `${SUPABASE_URL}/functions/v1/send-inquiry-reply`,
-          {
+      // ── Send directly via Brevo API — FROM info@spectrumadvanced.com ────────
+      const brevoKey = Deno.env.get("BREVO_API_KEY");
+      if (!brevoKey) {
+        console.warn("BREVO_API_KEY not set — email not sent");
+      } else {
+        try {
+          const brevoResp = await fetch("https://api.brevo.com/v3/smtp/email", {
             method: "POST",
-            headers: {
-              "Content-Type":  "application/json",
-              "Authorization": `Bearer ${SERVICE_KEY}`,
-              "apikey":        SERVICE_KEY,
-            },
-            body: JSON.stringify({ inquiry_id: webInquiryId }),
+            headers: { "api-key": brevoKey, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sender:      { name: "Fluoron Team", email: "info@spectrumadvanced.com" },
+              replyTo:     { email: "info@spectrumadvanced.com" },
+              to:          [{ email, name: `${first_name} ${last_name}`.trim() }],
+              subject:     emailSubject,
+              textContent: emailBody,
+            }),
+          });
+          if (brevoResp.ok) {
+            const result = await brevoResp.json().catch(() => ({}));
+            emailSent = true;
+            console.log("✓ PDF delivery sent from info@spectrumadvanced.com:", result?.messageId ?? "(no id)", "→", email);
+          } else {
+            const errText = await brevoResp.text().catch(() => "");
+            console.error("Brevo API failed:", brevoResp.status, errText);
           }
-        );
-        const sendResult = await sendResp.json().catch(() => ({}));
-        if (sendResp.ok && sendResult?.message_id) {
-          emailSent = true;
-          console.log("✓ PDF delivery email sent via Brevo:", sendResult.message_id, "→", email);
-        } else {
-          console.error("send-inquiry-reply failed:", sendResp.status, JSON.stringify(sendResult));
+        } catch (err) {
+          console.error("Brevo send threw:", err);
         }
-      } catch (err) {
-        console.error("send-inquiry-reply threw:", err);
       }
     }
 
