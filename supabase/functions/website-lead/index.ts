@@ -31,6 +31,10 @@ const PDF_MAP: Record<string, string> = {
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Aegis_FullOfferingLeaveBehind_FinalComp_March26-6.pdf",
   "Radiant Cleaning Services":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SA_RadiantCleaning_ServiceOfferingDoc_Final_Feb26comp-8.pdf",
+  "Radiant Cleaning Service Offering":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SA_RadiantCleaning_ServiceOfferingDoc_Final_Feb26comp-8.pdf",
+  "Radiant Cleaning":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SA_RadiantCleaning_ServiceOfferingDoc_Final_Feb26comp-8.pdf",
   "Paper Mill Reference":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PaperMillDoc_Final_Feb26comp-2.pdf",
   // Alias variants
