@@ -395,14 +395,14 @@ window.addEventListener('scroll',()=>{
     {txt:'SHIP NOTICE',x:.12,y:.58,period:29,delay:12.5},
     {txt:'CASH COLLECTED',x:.66,y:.62,period:33,delay:18.0}
   ];
-  const SOLAR_WIND=Array.from({length:72},(_,i)=>({
+  const SOLAR_WIND=Array.from({length:96},(_,i)=>({
     a:(Math.random()-.5)*1.15,
-    lane:(i%9-4)/4,
-    speed:.026+Math.random()*.042,
-    drift:.85+Math.random()*1.15,
-    size:.24+Math.random()*.68,
+    lane:(i%13-6)/6,
+    speed:.018+Math.random()*.032,
+    drift:1.0+Math.random()*1.45,
+    size:.20+Math.random()*.54,
     phase:Math.random()*10,
-    op:.16+Math.random()*.28
+    op:.14+Math.random()*.24
   }));
 
   // ── Orbit / Planet definitions ────────────────────────────────────────────
@@ -530,16 +530,16 @@ window.addEventListener('scroll',()=>{
       const t=(now*p.speed+p.phase)%1;
       const ease=t*t*(3-2*t);
       const direction=-1; // leftward/backward drift in the hero composition
-      const sourceX=CX - SR*.18 + Math.cos(p.a)*SR*.22;
-      const sourceY=CY + p.lane*SR*.74 + Math.sin(now*.18+p.phase)*SR*.08;
-      const x=sourceX + direction*(SR*.35 + ease*SR*5.6);
-      const y=sourceY + Math.sin(p.a+ease*2.4)*SR*.28;
-      const alpha=p.op*(1-ease)*(.85+.15*Math.sin(now*.8+p.phase));
-      const tail=SR*(.42+ease*1.1)*p.drift;
+      const sourceX=CX - SR*.08 + Math.cos(p.a)*SR*.18;
+      const sourceY=CY + p.lane*SR*.82 + Math.sin(now*.14+p.phase)*SR*.10;
+      const x=sourceX + direction*(SR*.26 + ease*SR*6.2);
+      const y=sourceY + Math.sin(p.a+ease*2.0)*SR*.25;
+      const alpha=p.op*Math.pow(1-ease,.9)*(.86+.14*Math.sin(now*.7+p.phase));
+      const tail=SR*(.55+ease*1.35)*p.drift;
       const g=ctx.createLinearGradient(x+tail,y,x,y);
       g.addColorStop(0,'rgba(0,184,217,0)');
-      g.addColorStop(.62,`rgba(96,238,255,${alpha*.46})`);
-      g.addColorStop(1,`rgba(230,255,255,${alpha*.9})`);
+      g.addColorStop(.54,`rgba(62,220,235,${alpha*.42})`);
+      g.addColorStop(1,`rgba(225,255,255,${alpha*.78})`);
       ctx.strokeStyle=g;
       ctx.lineWidth=p.size;
       ctx.lineCap='round';
@@ -550,7 +550,7 @@ window.addEventListener('scroll',()=>{
       if(p.size>.75){
         ctx.beginPath();
         ctx.arc(x,y,p.size*.48,0,Math.PI*2);
-        ctx.fillStyle=`rgba(210,255,255,${alpha*.62})`;
+        ctx.fillStyle=`rgba(210,255,255,${alpha*.56})`;
         ctx.fill();
       }
     }
@@ -558,7 +558,7 @@ window.addEventListener('scroll',()=>{
   }
 
   function drawCapacitorMark(CX,CY,SR){
-    const scale=SR/31;
+    const scale=SR/33;
     const ox=CX-26*scale, oy=CY-29*scale;
     function X(v){return ox+v*scale}
     function Y(v){return oy+v*scale}
@@ -566,42 +566,43 @@ window.addEventListener('scroll',()=>{
     ctx.lineJoin='round';
     ctx.lineCap='round';
 
-    // Simple Plasma Capacitor: thin constant-width stroke, top fades away.
+    // Simple Plasma Capacitor: keynote-clean monoline, top fades to air, base falls darker.
     const grad=ctx.createLinearGradient(CX,Y(7),CX,Y(53));
-    grad.addColorStop(0,'rgba(210,255,255,.04)');
-    grad.addColorStop(.18,'rgba(210,255,255,.18)');
-    grad.addColorStop(.48,'rgba(120,252,252,.72)');
-    grad.addColorStop(1,'rgba(42,240,240,.98)');
+    grad.addColorStop(0,'rgba(210,255,255,0)');
+    grad.addColorStop(.20,'rgba(190,255,255,.18)');
+    grad.addColorStop(.50,'rgba(98,248,248,.80)');
+    grad.addColorStop(.78,'rgba(24,205,218,.94)');
+    grad.addColorStop(1,'rgba(3,76,105,.96)');
 
     // Outer ionized field.
     ctx.globalCompositeOperation='screen';
-    let halo=ctx.createRadialGradient(CX,CY,SR*.15,CX,CY,SR*2.15);
-    halo.addColorStop(0,'rgba(200,255,255,.38)');
-    halo.addColorStop(.34,'rgba(0,235,242,.22)');
-    halo.addColorStop(.62,'rgba(0,184,217,.10)');
+    let halo=ctx.createRadialGradient(CX,CY,SR*.12,CX,CY,SR*2.45);
+    halo.addColorStop(0,'rgba(210,255,255,.30)');
+    halo.addColorStop(.34,'rgba(0,235,242,.20)');
+    halo.addColorStop(.62,'rgba(0,184,217,.09)');
     halo.addColorStop(1,'rgba(0,184,217,0)');
-    ctx.beginPath();ctx.arc(CX,CY,SR*2.15,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,SR*2.45,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
     ctx.globalCompositeOperation='source-over';
 
     ctx.shadowColor='rgba(100,255,255,1)';
-    ctx.shadowBlur=SR*.95;
+    ctx.shadowBlur=SR*1.08;
     ctx.strokeStyle=grad;
-    ctx.lineWidth=5.7*scale;
+    ctx.lineWidth=5.0*scale;
 
     // One path only: thin, same weight through legs and base.
     ctx.beginPath();
-    ctx.moveTo(X(15.2),Y(11));
-    ctx.lineTo(X(15.2),Y(36.5));
-    ctx.quadraticCurveTo(X(15.2),Y(50.5),X(26),Y(50.5));
-    ctx.quadraticCurveTo(X(36.8),Y(50.5),X(36.8),Y(36.5));
-    ctx.lineTo(X(36.8),Y(11));
+    ctx.moveTo(X(15.0),Y(10));
+    ctx.lineTo(X(15.0),Y(36.8));
+    ctx.quadraticCurveTo(X(15.0),Y(51.8),X(26),Y(51.8));
+    ctx.quadraticCurveTo(X(37.0),Y(51.8),X(37.0),Y(36.8));
+    ctx.lineTo(X(37.0),Y(10));
     ctx.stroke();
 
     // Strong fuzzy bloom around the simple silhouette.
     const core=ctx.createRadialGradient(CX,CY,SR*.1,CX,CY,SR*1.22);
-    core.addColorStop(0,'rgba(235,255,255,.28)');
-    core.addColorStop(.36,'rgba(55,245,245,.18)');
-    core.addColorStop(.72,'rgba(0,184,217,.10)');
+    core.addColorStop(0,'rgba(235,255,255,.22)');
+    core.addColorStop(.36,'rgba(55,245,245,.17)');
+    core.addColorStop(.72,'rgba(0,184,217,.11)');
     core.addColorStop(1,'rgba(0,184,217,0)');
     ctx.globalCompositeOperation='screen';
     ctx.beginPath();ctx.arc(CX,CY,SR*1.55,0,Math.PI*2);ctx.fillStyle=core;ctx.fill();
@@ -629,7 +630,7 @@ window.addEventListener('scroll',()=>{
 
     // Center — glowing planet "U"
     const pulse=1+0.012*Math.sin(now*0.42);
-    const SR=S*0.116*pulse;
+    const SR=S*0.132*pulse;
 
     // Haze layers
     for(let i=7;i>0;i--){
