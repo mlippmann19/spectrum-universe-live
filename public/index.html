@@ -54,7 +54,7 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 
 #orrery-canvas{display:block;flex-shrink:0;position:relative;z-index:2;margin-block:-22px -18px;filter:saturate(1.05) contrast(1.04);-webkit-mask-image:radial-gradient(ellipse 58% 52% at 50% 42%,#000 0%,#000 54%,rgba(0,0,0,.72) 70%,transparent 94%);mask-image:radial-gradient(ellipse 58% 52% at 50% 42%,#000 0%,#000 54%,rgba(0,0,0,.72) 70%,transparent 94%)}
 
-.sub{font-size:clamp(13px,1.35vw,16px);color:var(--muted);line-height:1.72;max-width:560px;margin:0 auto 4px;font-weight:400;letter-spacing:0.01em}
+.sub{font-size:clamp(14px,1.48vw,17px);color:var(--muted);line-height:1.72;max-width:590px;margin:0 auto 4px;font-weight:400;letter-spacing:0.01em}
 .sub strong{color:rgba(220,233,246,0.78);font-weight:500}
 
 .hcta{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
@@ -145,7 +145,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   .eyebrow{font-size:9px;letter-spacing:.22em;margin-top:68px}
   .eyebrow::before,.eyebrow::after{width:26px}
   h1{font-size:40px;line-height:.96}
-  .sub{font-size:13px;line-height:1.7;margin-top:0}
+  .sub{font-size:14px;line-height:1.7;margin-top:0}
   .hcta{margin-top:12px}
   .btn-p{width:100%;max-width:240px;text-align:center;padding:12px 18px}
   .mgrid{grid-template-columns:1fr}
@@ -280,7 +280,7 @@ window.addEventListener('scroll',()=>{
   function getS(){
     const mobile = window.innerWidth < 560;
     if(mobile) return Math.min(352, window.innerWidth * 0.9, window.innerHeight * 0.41);
-    return Math.min(575, window.innerWidth * 0.86, window.innerHeight * 0.58);
+    return Math.min(625, window.innerWidth * 0.90, window.innerHeight * 0.64);
   }
   let S = getS();
   function resize(){
@@ -497,6 +497,7 @@ window.addEventListener('scroll',()=>{
       planets:[
         {lbl:'PROSPECTS', a:0,       sz:12.4, col:'#18b7d6', trail:[], moons:[]},
         {lbl:'CRM',       a:Math.PI, sz:11.2, col:'#5d9edb', trail:[], moons:[]},
+        {lbl:'WEBSITE',   a:4.05,    sz:10.8, col:'#7de3ff', trail:[], moons:[]},
       ]
     },
     { r:0.276, spd:0.062, tx:77, ty:-25,    // middle — measured
@@ -504,6 +505,7 @@ window.addEventListener('scroll',()=>{
         {lbl:'OPS',       a:0.4,    sz:16.4, col:'#d98b22', trail:[], moons:[{a:1.2,spd:0.11,or:24,sz:3.2,col:'#b77b35'}]},
         {lbl:'ANALYTICS', a:2.5,    sz:12.0, col:'#8e79d9', trail:[], moons:[]},
         {lbl:'SERVICE',   a:4.6,    sz:12.0, col:'#2fbf9a', trail:[], moons:[]},
+        {lbl:'FINANCE',   a:5.65,   sz:11.4, col:'#f0c766', trail:[], moons:[]},
       ]
     },
     { r:0.40,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
@@ -521,17 +523,21 @@ window.addEventListener('scroll',()=>{
     'OPS':'OPS',
     'ERP':'ERP',
     'SERVICE':'SERVICE',
-    'ANALYTICS':'ANALYTICS'
+    'ANALYTICS':'ANALYTICS',
+    'FINANCE':'FINANCE',
+    'WEBSITE':'WEBSITE'
   };
   const LABEL_TUNING={
-    'PROSPECTS':{dx:16,dy:-12,anchor:'left'},
+    'PROSPECTS':{dx:18,dy:-18,anchor:'left'},
     'CRM':{dx:-18,dy:2,anchor:'right'},
     'OPS':{dx:16,dy:14,anchor:'left'},
     'SERVICE':{dx:14,dy:-8,anchor:'left'},
     'ANALYTICS':{dx:-14,dy:16,anchor:'right'},
-    'ERP':{dx:12,dy:4,anchor:'left'}
+    'FINANCE':{dx:15,dy:5,anchor:'left'},
+    'WEBSITE':{dx:-14,dy:-12,anchor:'right'},
+    'ERP':{dx:18,dy:16,anchor:'left'}
   };
-  const MOBILE_LABELS=new Set(['PROSPECTS','CRM','OPS','ERP','SERVICE','ANALYTICS']);
+  const MOBILE_LABELS=new Set(['PROSPECTS','CRM','OPS','ERP','SERVICE','ANALYTICS','FINANCE','WEBSITE']);
 
   function roundRectPath(x,y,w,h,r){
     const rr=Math.min(r,w/2,h/2);
@@ -731,7 +737,7 @@ window.addEventListener('scroll',()=>{
 
     // Center — glowing planet "U"
     const pulse=1+0.016*Math.sin(now*0.42);
-    const SR=S*0.166*pulse;
+    const SR=S*0.188*pulse;
 
     // ── Collect all planets → sort by z ─────────────────────────────────────
     const all=[];
@@ -824,7 +830,7 @@ window.addEventListener('scroll',()=>{
           label, x:lx, y:ly, w:tw, h:fs, fs,
           align:tune.anchor||(ux>.1?'left':ux<-.1?'right':'center'),
           alpha:.54*pl.sc+.22,
-          priority:(pl.sz||8)+(pl.lbl==='ERP'?10:0)+(pl.lbl==='PROSPECTS'?6:0)+(pl.lbl==='CRM'?5:0)+(pl.lbl==='OPS'?4:0)
+          priority:(pl.sz||8)+(pl.lbl==='ERP'?10:0)+(pl.lbl==='PROSPECTS'?7:0)+(pl.lbl==='CRM'?7:0)+(pl.lbl==='ANALYTICS'?6:0)+(pl.lbl==='FINANCE'?6:0)+(pl.lbl==='WEBSITE'?6:0)+(pl.lbl==='OPS'?4:0)
         });
       }
       ctx.restore();
@@ -847,7 +853,7 @@ window.addEventListener('scroll',()=>{
       const maxW=S-margin;
       x=Math.max(S*.13+l.w/2,Math.min(S*.87-l.w/2,x));
       y=Math.max(S*.10+l.h,Math.min(S*.60,y));
-      const offsets=[0,-14,14,-28,28,-42,42];
+      const offsets=[0,-12,12,-24,24,-36,36,-48,48];
       let box=null;
       for(const off of offsets){
         const tryY=Math.max(S*.10+l.h,Math.min(S*.62,y+off));
