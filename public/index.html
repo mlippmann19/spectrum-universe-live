@@ -441,40 +441,40 @@ window.addEventListener('scroll',()=>{
       }
     };
     // Sparse rising legs: density deliberately evaporates toward the top.
-    for(let i=0;i<=68;i++){
-      const t=i/68;
-      const y=3.5+t*35.0;
-      const density=.28+t*.92;
-      if(Math.random()<.62+t*.34) add(15.0,y,density);
-      if(Math.random()<.62+t*.34) add(37.0,y,density);
+    for(let i=0;i<=82;i++){
+      const t=i/82;
+      const y=-8.5+t*46.5;
+      const density=.38+t*.98;
+      if(Math.random()<.78+t*.20) add(15.0,y,density);
+      if(Math.random()<.78+t*.20) add(37.0,y,density);
     }
     // Sparse white particles at the tips so the U dissolves upward instead of stopping.
     for(const x of [15.0,37.0]){
-      for(let i=0;i<34;i++){
+      for(let i=0;i<48;i++){
         pts.push({
-          x:x+(Math.random()-.5)*7.8,
-          y:-7.5+Math.random()*22.0,
+          x:x+(Math.random()-.5)*8.4,
+          y:-14.0+Math.random()*27.0,
           base:0,
           size:.13+Math.random()*.32,
           phase:Math.random()*Math.PI*2,
           drift:1.5+Math.random()*3.0,
-          alpha:.20+Math.random()*.34,
+          alpha:.22+Math.random()*.38,
           tip:true
         });
       }
     }
     // Medium-density middle bridge so the U does not feel hollow in the upper center.
     for(const x of [15.0,37.0]){
-      for(let i=0;i<62;i++){
+      for(let i=0;i<82;i++){
         const t=Math.random();
         pts.push({
           x:x+(Math.random()-.5)*5.8,
-          y:-5.5+t*34.0+(Math.random()-.5)*3.2,
-          base:.18+t*.40,
+          y:-12.0+t*42.0+(Math.random()-.5)*3.4,
+          base:.20+t*.42,
           size:.16+Math.random()*.36,
           phase:Math.random()*Math.PI*2,
           drift:1.0+Math.random()*2.3,
-          alpha:.22+Math.random()*.30,
+          alpha:.24+Math.random()*.34,
           mid:true
         });
       }
@@ -692,7 +692,7 @@ window.addEventListener('scroll',()=>{
   }
 
   function drawCapacitorMark(CX,CY,SR,now){
-    const scale=SR/34;
+    const scale=SR/31;
     const ox=CX-26*scale, oy=CY-29*scale;
     ctx.save();
     ctx.globalCompositeOperation='screen';
@@ -755,7 +755,7 @@ window.addEventListener('scroll',()=>{
 
     // Center — glowing planet "U"
     const pulse=1+0.016*Math.sin(now*0.42);
-    const SR=S*0.188*pulse;
+    const SR=S*0.205*pulse;
 
     // ── Collect all planets → sort by z ─────────────────────────────────────
     const all=[];
