@@ -335,24 +335,48 @@ window.addEventListener('scroll',()=>{
     const [R,G,B]=hr(col);
     ctx.save();
     // Atm glow
-    const ag=ctx.createRadialGradient(px,py,r*.6,px,py,r*2.8);
-    ag.addColorStop(0,`rgba(${R},${G},${B},0.18)`);
+    const ag=ctx.createRadialGradient(px,py,r*.4,px,py,r*3.05);
+    ag.addColorStop(0,`rgba(${R},${G},${B},0.20)`);
+    ag.addColorStop(.52,`rgba(${R},${G},${B},0.08)`);
     ag.addColorStop(1,`rgba(${R},${G},${B},0)`);
-    ctx.beginPath();ctx.arc(px,py,r*2.8,0,Math.PI*2);ctx.fillStyle=ag;ctx.fill();
+    ctx.beginPath();ctx.arc(px,py,r*3.05,0,Math.PI*2);ctx.fillStyle=ag;ctx.fill();
     // Base sphere
-    const sg=ctx.createRadialGradient(px-r*.32,py-r*.34,r*.04,px,py,r);
-    sg.addColorStop(0,`rgb(${Math.min(R+100,255)},${Math.min(G+90,255)},${Math.min(B+70,255)})`);
-    sg.addColorStop(0.45,`rgb(${R},${G},${B})`);
-    sg.addColorStop(1,`rgb(${Math.max(R-70,0)},${Math.max(G-65,0)},${Math.max(B-50,0)})`);
+    const sg=ctx.createRadialGradient(px-r*.42,py-r*.42,r*.02,px+r*.18,py+r*.16,r*1.15);
+    sg.addColorStop(0,`rgb(${Math.min(R+125,255)},${Math.min(G+118,255)},${Math.min(B+112,255)})`);
+    sg.addColorStop(0.34,`rgb(${Math.min(R+22,255)},${Math.min(G+20,255)},${Math.min(B+18,255)})`);
+    sg.addColorStop(0.7,`rgb(${Math.max(R-36,0)},${Math.max(G-34,0)},${Math.max(B-32,0)})`);
+    sg.addColorStop(1,`rgb(${Math.max(R-92,0)},${Math.max(G-84,0)},${Math.max(B-76,0)})`);
     ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+    // Subtle planetary banding clipped to the sphere: gives the modules mass without cartoon stripes.
+    ctx.save();
+    ctx.beginPath();ctx.arc(px,py,r*.98,0,Math.PI*2);ctx.clip();
+    ctx.globalCompositeOperation='screen';
+    for(let i=-3;i<=3;i++){
+      const by=py+i*r*.23;
+      const bandA=0.025+0.018*(3-Math.abs(i));
+      ctx.strokeStyle=`rgba(235,255,255,${bandA})`;
+      ctx.lineWidth=Math.max(.35,r*.035);
+      ctx.beginPath();ctx.ellipse(px,by,r*.92,r*.09,0.04*i,0,Math.PI*2);ctx.stroke();
+    }
+    // A faint cool rim on the lit edge.
+    const rim=ctx.createRadialGradient(px-r*.15,py-r*.14,r*.62,px,py,r*1.1);
+    rim.addColorStop(.55,'rgba(255,255,255,0)');
+    rim.addColorStop(.88,'rgba(170,245,255,.13)');
+    rim.addColorStop(1,'rgba(170,245,255,.02)');
+    ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle=rim;ctx.fill();
+    ctx.restore();
     // Dark side terminator
-    const dg=ctx.createRadialGradient(px+r*.3,py+r*.3,0,px+r*.1,py+r*.1,r*1.15);
-    dg.addColorStop(0.2,'rgba(0,0,0,0)');dg.addColorStop(1,'rgba(0,0,0,0.68)');
+    const dg=ctx.createRadialGradient(px+r*.38,py+r*.34,0,px+r*.1,py+r*.1,r*1.18);
+    dg.addColorStop(0.12,'rgba(0,0,0,0)');dg.addColorStop(0.72,'rgba(0,0,0,0.22)');dg.addColorStop(1,'rgba(0,0,0,0.74)');
     ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle=dg;ctx.fill();
     // Specular
-    const spg=ctx.createRadialGradient(px-r*.38,py-r*.38,0,px-r*.3,py-r*.3,r*.52);
-    spg.addColorStop(0,'rgba(255,255,255,0.32)');spg.addColorStop(1,'rgba(255,255,255,0)');
+    const spg=ctx.createRadialGradient(px-r*.42,py-r*.44,0,px-r*.34,py-r*.34,r*.48);
+    spg.addColorStop(0,'rgba(255,255,255,0.38)');spg.addColorStop(.26,'rgba(255,255,255,0.12)');spg.addColorStop(1,'rgba(255,255,255,0)');
     ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.fillStyle=spg;ctx.fill();
+    // Hairline edge, like a lens-lit planetary silhouette.
+    ctx.strokeStyle='rgba(210,250,255,.12)';
+    ctx.lineWidth=Math.max(.45,r*.035);
+    ctx.beginPath();ctx.arc(px,py,r,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   }
 
@@ -438,20 +462,20 @@ window.addEventListener('scroll',()=>{
   const ORBITS=[
     { r:0.168, spd:0.095, tx:65, ty:15,     // inner — deliberate, still slightly faster
       planets:[
-        {lbl:'PROSPECTS', a:0,       sz:8.8,  col:'#00c8e8', trail:[], moons:[]},
-        {lbl:'CRM',       a:Math.PI, sz:7.8,  col:'#5eb8f0', trail:[], moons:[]},
+        {lbl:'PROSPECTS', a:0,       sz:12.4, col:'#18b7d6', trail:[], moons:[]},
+        {lbl:'CRM',       a:Math.PI, sz:11.2, col:'#5d9edb', trail:[], moons:[]},
       ]
     },
     { r:0.276, spd:0.062, tx:77, ty:-25,    // middle — measured
       planets:[
-        {lbl:'OPS',       a:0.4,    sz:15.5, col:'#f59e0b', trail:[], moons:[{a:1.2,spd:0.11,or:22,sz:2.7,col:'#d4943a'}]},
-        {lbl:'ANALYTICS', a:2.5,    sz:9.5,  col:'#a78bfa', trail:[], moons:[]},
-        {lbl:'SERVICE',   a:4.6,    sz:8.8,  col:'#34d399', trail:[], moons:[]},
+        {lbl:'OPS',       a:0.4,    sz:16.4, col:'#d98b22', trail:[], moons:[{a:1.2,spd:0.11,or:24,sz:3.2,col:'#b77b35'}]},
+        {lbl:'ANALYTICS', a:2.5,    sz:12.0, col:'#8e79d9', trail:[], moons:[]},
+        {lbl:'SERVICE',   a:4.6,    sz:12.0, col:'#2fbf9a', trail:[], moons:[]},
       ]
     },
     { r:0.40,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
       planets:[
-        {lbl:'ERP',       a:0.2,  sz:20, col:'#fb923c', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:32,sz:3.0,col:'#c47840'},{a:2.1,spd:0.05,or:43,sz:2.2,col:'#8a5a30'}]},
+        {lbl:'ERP',       a:0.2,  sz:17.0, col:'#e3752f', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:31,sz:3.0,col:'#a96638'},{a:2.1,spd:0.05,or:41,sz:2.2,col:'#7e5331'}]},
       ]
     },
   ];
