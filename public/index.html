@@ -770,7 +770,6 @@ window.addEventListener('scroll',()=>{
     }
     all.sort((a,b)=>a.z-b.z);
 
-    const labelCandidates=[];
     function drawCenterCore(){
       // Haze layers
       for(let i=7;i>0;i--){
@@ -829,28 +828,25 @@ window.addEventListener('scroll',()=>{
         }
       }
       if(!allowLabel) return;
-      // Label candidate — drawn after all planets so labels can be de-collided.
+      // Draw every planet label directly: pure white, no box, no shadow, no skip.
       const dx=pl.px-CX, dy=pl.py-CY;
       const dist=Math.sqrt(dx*dx+dy*dy)||1;
       const ux=dx/dist, uy=dy/dist;
       const lpad=r+12;
       const label=Object.prototype.hasOwnProperty.call(LABELS,pl.lbl)?LABELS[pl.lbl]:pl.lbl;
-      if(S<430 && !MOBILE_LABELS.has(pl.lbl)) return;
       const tune=LABEL_TUNING[pl.lbl]||{};
       const lx=pl.px+ux*lpad+(tune.dx||0), ly=pl.py+uy*lpad+(tune.dy||0);
       const fs=Math.round((S<430?7.4:7.8)*pl.sc+5.7);
       ctx.save();
       ctx.font=`600 ${fs}px 'Rajdhani',sans-serif`;
-      if(label){
-        const tw=ctx.measureText(label).width;
-        labelCandidates.push({
-          label, x:lx, y:ly, w:tw, h:fs, fs,
-          align:tune.anchor||(ux>.1?'left':ux<-.1?'right':'center'),
-          alpha:.54*pl.sc+.22,
-          priority:(pl.sz||8)+(pl.lbl==='ERP'?10:0)+(pl.lbl==='PROSPECTOR'?8:0)+(pl.lbl==='WEB INQUIRIES'?8:0)+(pl.lbl==='BD'?8:0)+(pl.lbl==='ANALYTICS'?6:0)+(pl.lbl==='ACCOUNTING'?6:0)+(pl.lbl==='FIELD SERVICE'?6:0),
-          phase:(pl.lbl.length*0.73)+(pl.sz||8)*0.17
-        });
-      }
+      ctx.textAlign=tune.anchor||(ux>.1?'left':ux<-.1?'right':'center');
+      ctx.textBaseline='middle';
+      ctx.shadowColor='transparent';
+      ctx.shadowBlur=0;
+      ctx.globalCompositeOperation='source-over';
+      ctx.fillStyle='rgba(255,255,255,0.96)';
+      const txOff=ctx.textAlign==='left'?5:ctx.textAlign==='right'?-5:0;
+      if(label) ctx.fillText(label,lx+txOff,ly);
       ctx.restore();
     }
     // Perspective pass: far-side planets render first, then the central U covers them.
@@ -858,41 +854,6 @@ window.addEventListener('scroll',()=>{
     drawCenterCore();
     for(const pl of all.filter(p=>p.z<=0)) drawPlanetPass(pl,true);
     for(const pl of all.filter(p=>p.z>0)) drawPlanetPass(pl,true,false);
-    // Draw labels with light collision avoidance and edge clamping.
-    labelCandidates.sort((a,b)=>b.priority-a.priority);
-    const placed=[];
-    const boxFor=(l,x,y)=>{
-      const left=l.align==='right'?x-l.w-8:l.align==='left'?x:x-l.w/2-4;
-      return {left,top:y-l.h*.62,width:l.w+8,height:l.h*1.24};
-    };
-    const hit=(a,b)=>a.left<b.left+b.width&&a.left+a.width>b.left&&a.top<b.top+b.height&&a.top+a.height>b.top;
-    for(const l of labelCandidates){
-      let x=l.x, y=l.y;
-      const margin=10;
-      const maxW=S-margin;
-      x=Math.max(S*.13+l.w/2,Math.min(S*.87-l.w/2,x));
-      y=Math.max(S*.10+l.h,Math.min(S*.60,y));
-      const offsets=[0,-12,12,-24,24,-36,36,-48,48];
-      let box=null;
-      for(const off of offsets){
-        const tryY=Math.max(S*.10+l.h,Math.min(S*.62,y+off));
-        const tryBox=boxFor(l,x,tryY);
-        if(!placed.some(p=>hit(tryBox,p))){
-          y=tryY; box=tryBox; break;
-        }
-      }
-      if(!box) continue;
-      placed.push(box);
-      ctx.save();
-      ctx.font=`600 ${l.fs}px 'Rajdhani',sans-serif`;
-      ctx.textAlign=l.align;ctx.textBaseline='middle';
-      const txOff=l.align==='left'?5:l.align==='right'?-5:0;
-      ctx.shadowColor='transparent';
-      ctx.shadowBlur=0;
-      ctx.fillStyle='rgba(255,255,255,0.96)';
-      ctx.fillText(l.label,x+txOff,y);
-      ctx.restore();
-    }
     requestAnimationFrame(tick);
   }
   // Tiny polyfill for var_cyan used in tick
