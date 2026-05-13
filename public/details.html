@@ -167,7 +167,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   </a>
   <div class="nr">
     <a href="mailto:hello@universecrm.io" class="nlink">Contact</a>
-    <a href="details.html#access" class="nbtn">Early Access</a>
+    <a href="#access" class="nbtn">Early Access</a>
   </div>
 </nav>
 
@@ -177,8 +177,47 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   <h1>Your Industry<em>Your Universe</em></h1>
   <canvas id="orrery-canvas"></canvas>
   <p class="sub">The world's first <strong>end-to-end revenue operating system</strong> built exclusively for B2B manufacturers — from first prospect to collected payment, without switching tools.</p>
-  <div class="hcta"><a href="details.html#access" class="btn-p">Request Early Access</a></div>
+  <div class="hcta"><a href="#access" class="btn-p">Request Early Access</a></div>
 </section>
+
+<div class="divider"></div>
+
+<section class="pipeline-wrap reveal">
+  <div class="pipeline-kicker">The Complete Revenue Chain</div>
+  <div class="chain" id="chain"></div>
+  <p class="chain-caption">Every other platform handles <strong>fragments</strong> of this chain. Universe is the first system to close the loop — <strong>prospect intelligence through cash collection</strong>, purpose-built for industrial B2B.</p>
+</section>
+
+<section class="modules-wrap reveal">
+  <div class="modules-head">
+    <h2>Every Module.<br/>One Universe.</h2>
+    <p>Each layer of your operation built natively — not bolted on.</p>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+</section>
+
+<section class="cta-wrap reveal" id="access">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <h2>Join the First Wave.</h2>
+      <p>We're onboarding a select cohort of B2B manufacturers in 2026. Every deployment is configured to your exact business — not a generic template.</p>
+    </div>
+    <div class="cta-right">
+      <form class="aform" onsubmit="handleSub(event)">
+        <input class="ainput" type="text" placeholder="Your name" id="fn" required/>
+        <input class="ainput" type="email" placeholder="Work email" id="fe" required/>
+        <input class="ainput" type="text" placeholder="Company name" id="fc" required/>
+        <button type="submit" class="btn-p">Request Access →</button>
+        <p class="anote">No calls. No automation. A real reply.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="fb">Universe<span>CRM</span> · universecrm.io</span>
+  <span class="fr">hello@universecrm.io</span>
+</footer>
 
 <div class="ov" id="ov" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ob">
@@ -192,13 +231,11 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
 // ── Pipeline ─────────────────────────────────────────────────────────────────
 const steps=['Prospect','Contact','MQL','TQL','Quote','Purchase Order','Production','Shipment','Invoice','Collect'];
 const cc=document.getElementById('chain');
-if(cc){
-  steps.forEach((s,i)=>{
-    const n=document.createElement('div');n.className='cnode';
-    n.innerHTML=`<div class="cdot"></div><div class="ctxt">${s}</div>`;cc.appendChild(n);
-    if(i<steps.length-1){const a=document.createElement('div');a.className='carr';cc.appendChild(a);}
-  });
-}
+steps.forEach((s,i)=>{
+  const n=document.createElement('div');n.className='cnode';
+  n.innerHTML=`<div class="cdot"></div><div class="ctxt">${s}</div>`;cc.appendChild(n);
+  if(i<steps.length-1){const a=document.createElement('div');a.className='carr';cc.appendChild(a);}
+});
 
 // ── Modules ────────────────────────────────────────────────────────────────
 const mods=[
@@ -212,9 +249,7 @@ const mods=[
   {n:'08',name:'Invoicing',desc:'Generate, send, and track invoices. Know who owes what and when — without leaving the system.'},
 ];
 const mg=document.getElementById('mgrid');
-if(mg){
-  mods.forEach(m=>{mg.innerHTML+=`<div class="mcard"><div class="mn">${m.n}</div><div class="mname">${m.name}</div><div class="mdesc">${m.desc}</div></div>`;});
-}
+mods.forEach(m=>{mg.innerHTML+=`<div class="mcard"><div class="mn">${m.n}</div><div class="mname">${m.name}</div><div class="mdesc">${m.desc}</div></div>`;});
 
 // ── Form ──────────────────────────────────────────────────────────────────────
 function handleSub(e){e.preventDefault();document.getElementById('ov').classList.add('open');['fn','fe','fc'].forEach(id=>document.getElementById(id).value='');}
