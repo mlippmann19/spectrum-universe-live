@@ -495,27 +495,21 @@ window.addEventListener('scroll',()=>{
   const ORBITS=[
     { r:0.168, spd:0.095, tx:65, ty:15,     // inner — deliberate, still slightly faster
       planets:[
-        {lbl:'PROSPECTOR',     a:0,       sz:12.4, col:'#18b7d6', trail:[], moons:[]},
-        {lbl:'WEB INQUIRIES',  a:Math.PI, sz:11.2, col:'#5d9edb', trail:[], moons:[]},
-        {lbl:'COMPANIES',      a:4.05,    sz:10.8, col:'#7de3ff', trail:[], moons:[]},
-        {lbl:'CONTACTS',       a:5.35,    sz:9.8,  col:'#7b8fa8', trail:[], moons:[]},
+        {lbl:'PROSPECTS', a:0.35,    sz:12.8, col:'#18b7d6', trail:[], moons:[]},
+        {lbl:'CRM',       a:3.35,    sz:11.6, col:'#5d9edb', trail:[], moons:[]},
+        {lbl:'WEBSITE',   a:5.05,    sz:10.8, col:'#7de3ff', trail:[], moons:[]},
       ]
     },
     { r:0.276, spd:0.062, tx:77, ty:-25,    // middle — measured
       planets:[
-        {lbl:'BD',             a:0.4,    sz:16.4, col:'#34cfc1', trail:[], moons:[{a:1.2,spd:0.11,or:24,sz:3.2,col:'#2b9d93'}]},
-        {lbl:'QUOTES',         a:1.65,   sz:11.6, col:'#cfd8e3', trail:[], moons:[]},
-        {lbl:'ANALYTICS',      a:2.7,    sz:12.0, col:'#8e79d9', trail:[], moons:[]},
-        {lbl:'FIELD SERVICE',  a:4.55,   sz:12.0, col:'#2fbf9a', trail:[], moons:[]},
-        {lbl:'ACCOUNTING',     a:5.65,   sz:11.4, col:'#f0c766', trail:[], moons:[]},
+        {lbl:'SERVICE',   a:0.85,    sz:13.6, col:'#2fbf9a', trail:[], moons:[]},
+        {lbl:'ANALYTICS', a:2.85,    sz:12.2, col:'#8e79d9', trail:[], moons:[]},
+        {lbl:'FINANCE',   a:5.35,    sz:11.8, col:'#f0c766', trail:[], moons:[]},
       ]
     },
     { r:0.40,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
       planets:[
-        {lbl:'ERP',            a:0.2,  sz:17.0, col:'#e3752f', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:31,sz:3.0,col:'#a96638'},{a:2.1,spd:0.05,or:41,sz:2.2,col:'#7e5331'}]},
-        {lbl:'SIOP',           a:2.15, sz:12.0, col:'#7c5dd8', trail:[], moons:[]},
-        {lbl:'OPERATIONS',     a:3.45, sz:11.8, col:'#8aa0b5', trail:[], moons:[]},
-        {lbl:'INVOICING',      a:4.85, sz:11.2, col:'#d8a241', trail:[], moons:[]},
+        {lbl:'ERP',       a:0.35,  sz:17.0, col:'#e3752f', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:31,sz:3.0,col:'#a96638'},{a:2.1,spd:0.05,or:41,sz:2.2,col:'#7e5331'}]},
       ]
     },
   ];
@@ -523,39 +517,29 @@ window.addEventListener('scroll',()=>{
   const TRAIL=3;
   let T=0, gRot=0;
   const LABELS={
-    'PROSPECTOR':'PROSPECTOR',
-    'WEB INQUIRIES':'WEB INQUIRIES',
-    'BD':'BD',
-    'QUOTES':'QUOTES',
-    'COMPANIES':'COMPANIES',
-    'CONTACTS':'CONTACTS',
-    'OPERATIONS':'OPERATIONS',
-    'FIELD SERVICE':'FIELD SERVICE',
-    'PROJECTS':'PROJECTS',
-    'SIOP':'SIOP',
+    'PROSPECTS':'PROSPECTS',
+    'CRM':'CRM',
+    'WEBSITE':'WEBSITE',
+    'SERVICE':'SERVICE',
+    'FINANCE':'FINANCE',
     'ERP':'ERP',
-    'ACCOUNTING':'ACCOUNTING',
-    'INVOICING':'INVOICING',
     'ANALYTICS':'ANALYTICS',
-    'HOT BOX':'HOT BOX',
-    'UNIVERSE':'UNIVERSE'
   };
   const LABEL_TUNING={
-    'PROSPECTOR':{dx:20,dy:-18,anchor:'left'},
-    'WEB INQUIRIES':{dx:-20,dy:4,anchor:'right'},
-    'BD':{dx:16,dy:14,anchor:'left'},
-    'QUOTES':{dx:-14,dy:-12,anchor:'right'},
-    'COMPANIES':{dx:-18,dy:-12,anchor:'right'},
-    'CONTACTS':{dx:12,dy:12,anchor:'left'},
-    'OPERATIONS':{dx:-16,dy:8,anchor:'right'},
-    'FIELD SERVICE':{dx:16,dy:-8,anchor:'left'},
-    'SIOP':{dx:-14,dy:-12,anchor:'right'},
-    'ACCOUNTING':{dx:15,dy:5,anchor:'left'},
-    'INVOICING':{dx:-10,dy:15,anchor:'right'},
+    'PROSPECTS':{dx:18,dy:-18,anchor:'left'},
+    'CRM':{dx:-20,dy:2,anchor:'right'},
+    'WEBSITE':{dx:-16,dy:-12,anchor:'right'},
+    'SERVICE':{dx:16,dy:-10,anchor:'left'},
+    'FINANCE':{dx:15,dy:6,anchor:'left'},
     'ANALYTICS':{dx:-14,dy:16,anchor:'right'},
     'ERP':{dx:18,dy:16,anchor:'left'}
   };
-  const MOBILE_LABELS=new Set(['PROSPECTOR','WEB INQUIRIES','BD','ERP','FIELD SERVICE','ANALYTICS','ACCOUNTING','SIOP']);
+  const MOBILE_LABELS=new Set(['PROSPECTS','CRM','WEBSITE','ERP','SERVICE','ANALYTICS','FINANCE']);
+  const LABEL_GROUPS=[
+    new Set(['PROSPECTS','CRM','ERP']),
+    new Set(['WEBSITE','SERVICE','FINANCE']),
+    new Set(['ANALYTICS','PROSPECTS','ERP'])
+  ];
 
   function roundRectPath(x,y,w,h,r){
     const rr=Math.min(r,w/2,h/2);
@@ -844,7 +828,18 @@ window.addEventListener('scroll',()=>{
       ctx.shadowColor='transparent';
       ctx.shadowBlur=0;
       ctx.globalCompositeOperation='source-over';
-      ctx.fillStyle='rgba(255,255,255,0.96)';
+      const cycle=(now/7.5)%LABEL_GROUPS.length;
+      const active=Math.floor(cycle);
+      const next=(active+1)%LABEL_GROUPS.length;
+      const t=cycle-active;
+      const smooth=t*t*(3-2*t);
+      const inActive=LABEL_GROUPS[active].has(pl.lbl);
+      const inNext=LABEL_GROUPS[next].has(pl.lbl);
+      let labelAlpha=0;
+      if(inActive) labelAlpha=Math.max(labelAlpha,1-smooth);
+      if(inNext) labelAlpha=Math.max(labelAlpha,smooth);
+      if(labelAlpha<0.08){ctx.restore();return;}
+      ctx.fillStyle=`rgba(255,255,255,${0.18+labelAlpha*.78})`;
       const txOff=ctx.textAlign==='left'?5:ctx.textAlign==='right'?-5:0;
       if(label) ctx.fillText(label,lx+txOff,ly);
       ctx.restore();
