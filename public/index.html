@@ -441,40 +441,40 @@ window.addEventListener('scroll',()=>{
       }
     };
     // Sparse rising legs: density deliberately evaporates toward the top.
-    for(let i=0;i<=82;i++){
-      const t=i/82;
-      const y=-8.5+t*46.5;
-      const density=.38+t*.98;
-      if(Math.random()<.78+t*.20) add(15.0,y,density);
-      if(Math.random()<.78+t*.20) add(37.0,y,density);
+    for(let i=0;i<=96;i++){
+      const t=i/96;
+      const y=-18.0+t*57.0;
+      const density=.46+t*1.02;
+      if(Math.random()<.86+t*.12) add(15.0,y,density);
+      if(Math.random()<.86+t*.12) add(37.0,y,density);
     }
     // Sparse white particles at the tips so the U dissolves upward instead of stopping.
     for(const x of [15.0,37.0]){
-      for(let i=0;i<48;i++){
+      for(let i=0;i<64;i++){
         pts.push({
-          x:x+(Math.random()-.5)*8.4,
-          y:-14.0+Math.random()*27.0,
+          x:x+(Math.random()-.5)*9.2,
+          y:-25.0+Math.random()*37.0,
           base:0,
           size:.13+Math.random()*.32,
           phase:Math.random()*Math.PI*2,
           drift:1.5+Math.random()*3.0,
-          alpha:.22+Math.random()*.38,
+          alpha:.24+Math.random()*.40,
           tip:true
         });
       }
     }
     // Medium-density middle bridge so the U does not feel hollow in the upper center.
     for(const x of [15.0,37.0]){
-      for(let i=0;i<82;i++){
+      for(let i=0;i<108;i++){
         const t=Math.random();
         pts.push({
           x:x+(Math.random()-.5)*5.8,
-          y:-12.0+t*42.0+(Math.random()-.5)*3.4,
-          base:.20+t*.42,
+          y:-21.0+t*52.0+(Math.random()-.5)*3.8,
+          base:.22+t*.46,
           size:.16+Math.random()*.36,
           phase:Math.random()*Math.PI*2,
           drift:1.0+Math.random()*2.3,
-          alpha:.24+Math.random()*.34,
+          alpha:.26+Math.random()*.36,
           mid:true
         });
       }
@@ -755,7 +755,7 @@ window.addEventListener('scroll',()=>{
 
     // Center — glowing planet "U"
     const pulse=1+0.016*Math.sin(now*0.42);
-    const SR=S*0.205*pulse;
+    const SR=S*0.225*pulse;
 
     // ── Collect all planets → sort by z ─────────────────────────────────────
     const all=[];
@@ -847,7 +847,8 @@ window.addEventListener('scroll',()=>{
           label, x:lx, y:ly, w:tw, h:fs, fs,
           align:tune.anchor||(ux>.1?'left':ux<-.1?'right':'center'),
           alpha:.54*pl.sc+.22,
-          priority:(pl.sz||8)+(pl.lbl==='ERP'?10:0)+(pl.lbl==='PROSPECTOR'?8:0)+(pl.lbl==='WEB INQUIRIES'?8:0)+(pl.lbl==='BD'?8:0)+(pl.lbl==='ANALYTICS'?6:0)+(pl.lbl==='ACCOUNTING'?6:0)+(pl.lbl==='FIELD SERVICE'?6:0)
+          priority:(pl.sz||8)+(pl.lbl==='ERP'?10:0)+(pl.lbl==='PROSPECTOR'?8:0)+(pl.lbl==='WEB INQUIRIES'?8:0)+(pl.lbl==='BD'?8:0)+(pl.lbl==='ANALYTICS'?6:0)+(pl.lbl==='ACCOUNTING'?6:0)+(pl.lbl==='FIELD SERVICE'?6:0),
+          phase:(pl.lbl.length*0.73)+(pl.sz||8)*0.17
         });
       }
       ctx.restore();
@@ -888,7 +889,8 @@ window.addEventListener('scroll',()=>{
       const txOff=l.align==='left'?5:l.align==='right'?-5:0;
       ctx.shadowColor='transparent';
       ctx.shadowBlur=0;
-      ctx.fillStyle=`rgba(255,255,255,${Math.min(.98,l.alpha+.24)})`;
+      const labelFade=.18+.82*Math.pow(.5+.5*Math.sin(now*.34+l.phase),1.7);
+      ctx.fillStyle=`rgba(255,255,255,${Math.min(.98,(l.alpha+.24)*labelFade)})`;
       ctx.fillText(l.label,x+txOff,y);
       ctx.restore();
     }
