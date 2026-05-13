@@ -1,19 +1,18 @@
 /**
- * Spectrum Universe — Website Lead Webhook (Fluoron contact / PDF download forms)
+ * Spectrum Universe — Website Lead Webhook (Fluoron PDF download form)
  * Public endpoint — no auth required. CORS allows *.fluoron.com and localhost.
  *
  * Two form types:
  *   - pdf_download : minimal data (name + email), always Prospect stage
- *                   → sends the requested PDFs immediately via Resend
- *   - contact      : MQL-scoreable, auto-advances to Connected (contact) or MQL
- *                   → sends a follow-up / qualification email
+ *                   → inserts into web_inquiries, fires send-inquiry-reply (Brevo)
+ *   - contact      : handled by handle-web-inquiry; falls through here as legacy
  *
- * Creates company / contact / deal / activity with lead_source='website'.
+ * Creates company / contact / deal with lead_source='website'.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// ── PDF catalogue — label (as sent by form) → public URL ─────────────────────
+// ── PDF catalogue — label (as sent by form checkbox) → public URL ─────────────
 const PDF_MAP: Record<string, string> = {
   "Spectrum Advanced Capability Statement":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_CapabilityDoc_Final_Feb26-1-comp.pdf",
@@ -23,7 +22,7 @@ const PDF_MAP: Record<string, string> = {
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_FlexPackagingDoc_Final_March26comp-2.pdf",
   "Spectrum Advanced PFAS Statement":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PFASStatement_Finalcomp_March26.pdf",
-  // Legacy / alias labels (in case the form ever shipped alternate text)
+  // Alias variants
   "Fluoron Capability Statement":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_CapabilityDoc_Final_Feb26-1-comp.pdf",
   "Heat Shrink Fluoropolymer Sleeves":
@@ -34,7 +33,7 @@ const PDF_MAP: Record<string, string> = {
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_FlexPackagingDoc_Final_March26comp-2.pdf",
 };
 
-// ── State / Province / Country lookup tables ──────────────────────────────────
+// ── State / Province / Country tables ────────────────────────────────────────
 const US_STATES: Record<string, string> = {
   "Alabama":"AL","Alaska":"AK","Arizona":"AZ","Arkansas":"AR","California":"CA",
   "Colorado":"CO","Connecticut":"CT","Delaware":"DE","Florida":"FL","Georgia":"GA",
@@ -61,103 +60,69 @@ const COUNTRIES: Record<string, string> = {
   "Brazil":"BR","Netherlands":"NL","Sweden":"SE","Italy":"IT","Spain":"ES",
 };
 
-function normState(s: string | null | undefined): string | null {
+function normState(s?: string | null): string | null {
   if (!s) return null;
-  const trimmed = s.trim();
-  if (US_STATES[trimmed]) return US_STATES[trimmed];
-  if (CA_PROVS[trimmed]) return CA_PROVS[trimmed];
-  if (trimmed.length <= 3) return trimmed.toUpperCase();
-  return trimmed;
+  const t = s.trim();
+  return US_STATES[t] ?? CA_PROVS[t] ?? (t.length <= 3 ? t.toUpperCase() : t);
 }
-
-function normCountry(c: string | null | undefined, state: string | null): string | null {
+function normCountry(c?: string | null, state?: string | null): string | null {
   if (!c) {
     if (state && Object.values(US_STATES).includes(state)) return "US";
     if (state && Object.values(CA_PROVS).includes(state)) return "CA";
     return null;
   }
-  const trimmed = c.trim();
-  if (COUNTRIES[trimmed]) return COUNTRIES[trimmed];
-  if (trimmed.length <= 3) return trimmed.toUpperCase();
-  return "US";
+  const t = c.trim();
+  return COUNTRIES[t] ?? (t.length <= 3 ? t.toUpperCase() : "US");
+}
+function buildCompanyName(name: string, city: string|null, state: string|null, country: string|null): string {
+  return [name, city, state, country].filter(Boolean).join(" - ");
 }
 
-function buildCompanyName(name: string, city: string | null, state: string | null, country: string | null): string {
-  const parts = [name];
-  if (city) parts.push(city);
-  if (state) parts.push(state);
-  if (country) parts.push(country);
-  return parts.join(" - ");
-}
-
-// ── MQL scoring ──────────────────────────────────────────────────────────────
-function scoreLead(payload: any): { score: number; tqlReady: boolean } {
+// ── MQL scoring ───────────────────────────────────────────────────────────────
+function scoreLead(p: any): { score: number; tqlReady: boolean } {
   let score = 0;
-  if (payload.first_name || payload.full_name) score += 10;
-  if (payload.email) score += 20;
-  if (payload.company || payload.company_name) score += 20;
-  if (payload.phone) score += 5;
-  if (payload.title) score += 5;
-  if (payload.qual_issue_type) score += 15;
-  if (payload.qual_process_type) score += 10;
-  if (payload.qual_current_solution) score += 10;
-  if (payload.qual_urgency) score += 10;
-  if (payload.qual_buying_role) score += 5;
+  if (p.first_name || p.full_name) score += 10;
+  if (p.email)  score += 20;
+  if (p.company || p.company_name) score += 20;
+  if (p.phone)  score += 5;
+  if (p.title)  score += 5;
+  if (p.qual_issue_type)       score += 15;
+  if (p.qual_process_type)     score += 10;
+  if (p.qual_current_solution) score += 10;
+  if (p.qual_urgency)          score += 10;
+  if (p.qual_buying_role)      score += 5;
   const specFields = [
     "spec_roll_type","spec_roll_position","spec_diameter","spec_face_length",
     "spec_roll_material","spec_substrate","spec_temperature","spec_line_speed",
-    "spec_environment","spec_failure_description","spec_current_sleeve","spec_failure_frequency"
+    "spec_environment","spec_failure_description","spec_current_sleeve","spec_failure_frequency",
   ];
-  const specCount = specFields.filter(f => payload[f]).length;
+  const specCount = specFields.filter(f => p[f]).length;
   score += specCount * 3;
-  const tqlReady = specCount >= 6;
-  return { score, tqlReady };
+  return { score, tqlReady: specCount >= 6 };
 }
 
-// ── Stage routing ────────────────────────────────────────────────────────────
-function determineStage(formType: string, score: number): string {
-  if (formType === "pdf_download") return "prospect";
-  if (score >= 55) return "mql";
-  if (score >= 30) return "contact";
-  return "prospect";
-}
+// ── Build PDF delivery email body ─────────────────────────────────────────────
+function buildPdfEmail(firstName: string, pdfsRequested: string[]): { subject: string; body: string } {
+  const pdfLines: string[] = [];
+  const missing: string[] = [];
 
-// ── Email builder ─────────────────────────────────────────────────────────────
-function buildEmail(opts: {
-  formType: string;
-  firstName: string;
-  score: number;
-  payload: any;
-  ownerName: string;
-  pdfsRequested: string[];
-}): { subject: string; body: string; isPdfDelivery: boolean } {
-  const { formType, firstName, score, payload, ownerName, pdfsRequested } = opts;
-
-  // ── PDF Download: send the actual documents ─────────────────────────────
-  if (formType === "pdf_download") {
-    const subject = "Your Fluoron Technical Literature";
-
-    // Build per-PDF download lines
-    const pdfLines: string[] = [];
-    const missing: string[] = [];
-    for (const label of pdfsRequested) {
-      const url = PDF_MAP[label];
-      if (url) {
-        pdfLines.push(`• ${label}\n  ${url}`);
-      } else {
-        missing.push(label);
-        pdfLines.push(`• ${label}\n  (see https://fluoron.com/resources/)`);
-      }
+  for (const label of pdfsRequested) {
+    const url = PDF_MAP[label];
+    if (url) {
+      pdfLines.push(`• ${label}\n  ${url}`);
+    } else {
+      missing.push(label);
+      pdfLines.push(`• ${label}\n  https://fluoron.com/resources/`);
     }
-    if (missing.length) {
-      console.warn("PDF labels not found in PDF_MAP:", missing.join(", "));
-    }
+  }
+  if (missing.length) console.warn("PDF labels not in PDF_MAP:", missing.join(", "));
 
-    const docBlock = pdfLines.length
-      ? pdfLines.join("\n\n")
-      : "• All Fluoron Resources\n  https://fluoron.com/resources/";
+  const docBlock = pdfLines.length
+    ? pdfLines.join("\n\n")
+    : "• All Fluoron Resources\n  https://fluoron.com/resources/";
 
-    const body =
+  const subject = "Your Fluoron Technical Literature";
+  const body =
 `Hi ${firstName},
 
 Here are the Fluoron documents you requested — click to download directly:
@@ -172,191 +137,95 @@ Best regards,
 The Fluoron Team
 Spectrum Advanced | info@spectrumadvanced.com | (410) 392-0220`;
 
-    return { subject, body, isPdfDelivery: true };
-  }
-
-  // ── Contact form: qualification follow-up ──────────────────────────────
-  if (score >= 55) {
-    const productLabel = (payload.product_interest && payload.product_interest.trim())
-      ? payload.product_interest.trim()
-      : "Sleeve Specification";
-    const subject = `Re: Your Fluoron Inquiry — ${productLabel}`;
-
-    const specLines: string[] = [];
-    if (payload.roll_diameter)            specLines.push(`- Roll Diameter: ${payload.roll_diameter}`);
-    if (payload.face_length)              specLines.push(`- Face Length: ${payload.face_length}`);
-    if (payload.current_roller_material)  specLines.push(`- Current Material: ${payload.current_roller_material}`);
-    if (payload.environment)              specLines.push(`- Environment: ${payload.environment}`);
-    if (payload.operating_temperature)    specLines.push(`- Operating Temperature: ${payload.operating_temperature}`);
-    if (payload.line_speed)               specLines.push(`- Line Speed: ${payload.line_speed}`);
-    if (payload.failure_description)      specLines.push(`- Failure Description: ${payload.failure_description}`);
-    if (payload.timeline)                 specLines.push(`- Timeline: ${payload.timeline}`);
-
-    const specsBlock = specLines.length
-      ? `\nWe've noted the following application details:\n${specLines.join("\n")}\n`
-      : "";
-
-    const body =
-`Hi ${firstName},
-
-Thank you for the detailed inquiry! Our engineering team has received your request and will follow up within one business day with a product recommendation.
-${specsBlock}
-If anything changes or you have additional specs to share, just reply.
-
-Best regards,
-${ownerName}
-Spectrum Advanced / Fluoron`;
-    return { subject, body, isPdfDelivery: false };
-  }
-
-  // Contact form, score < 55
-  const subject = "Re: Your Fluoron Inquiry";
-  const missingQs: string[] = [];
-  if (!(payload.company || payload.company_name)) missingQs.push("- What company are you with?");
-  if (!payload.product_interest)                  missingQs.push("- What product(s) are you evaluating?");
-  if (!payload.message || (payload.message || "").length <= 40) {
-    missingQs.push("- Can you describe your current roller challenge in a bit more detail?");
-  }
-  if (!payload.timeline) missingQs.push("- What's your timeline?");
-
-  const missingBlock = missingQs.length
-    ? `\nTo prepare a product spec for you, our team needs a few more details:\n${missingQs.join("\n")}\n`
-    : "";
-
-  const body =
-`Hi ${firstName},
-
-Thank you for reaching out! We received your message and want to make sure we get you the right recommendation.
-${missingBlock}
-If you'd prefer to talk through it live, call us at (410) 392-0220.
-
-Best regards,
-${ownerName}
-Spectrum Advanced / Fluoron`;
-  return { subject, body, isPdfDelivery: false };
+  return { subject, body };
 }
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, x-website-key",
   "Access-Control-Max-Age": "86400",
 };
+const jsonResp = (b: unknown, s = 200) =>
+  new Response(JSON.stringify(b), { status: s, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } });
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
-  });
-}
-
+// ── Main handler ──────────────────────────────────────────────────────────────
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
-  }
-  if (req.method !== "POST") {
-    return jsonResponse({ error: "Method not allowed" }, 405);
-  }
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS_HEADERS });
+  if (req.method !== "POST")   return jsonResp({ error: "Method not allowed" }, 405);
 
   let payload: any;
-  try {
-    payload = await req.json();
-  } catch {
-    return jsonResponse({ error: "Invalid JSON" }, 400);
-  }
+  try { payload = await req.json(); }
+  catch { return jsonResp({ error: "Invalid JSON" }, 400); }
 
-  // ── Name handling: support full_name as alias ────────────────────────────
+  // ── Parse names ───────────────────────────────────────────────────────────
   let first_name = (payload?.first_name ?? "").toString().trim();
   let last_name  = (payload?.last_name  ?? "").toString().trim();
   const full_name = (payload?.full_name ?? "").toString().trim();
   if ((!first_name || !last_name) && full_name) {
-    const parts = full_name.split(/\s+/);
-    const [first, ...rest] = parts;
+    const [first, ...rest] = full_name.split(/\s+/);
     if (!first_name) first_name = first || "";
     if (!last_name)  last_name  = rest.join(" ");
   }
-
   const email = (payload?.email ?? "").toString().trim();
-
-  if (!first_name || !email) {
-    return jsonResponse({ error: "first_name (or full_name) and email are required" }, 400);
-  }
+  if (!first_name || !email) return jsonResp({ error: "first_name (or full_name) and email are required" }, 400);
   if (!last_name) last_name = "";
 
   const form_type = (payload?.form_type ?? "").toString().trim() || "contact";
-
-  // ── Common fields ────────────────────────────────────────────────────────
-  const phone   = payload?.phone?.toString().trim() || null;
-  const title   = payload?.title?.toString().trim() || null;
-  const rawCompany =
-    (payload?.company_name?.toString().trim() || payload?.company?.toString().trim()) || null;
-  const city    = payload?.city?.toString().trim() || null;
-  const state   = normState(payload?.state);
-  const country = normCountry(payload?.country, state);
-  const website = payload?.website?.toString().trim() || null;
-  const industry = payload?.industry?.toString().trim() || null;
-
+  const phone      = payload?.phone?.toString().trim() || null;
+  const title      = payload?.title?.toString().trim() || null;
+  const rawCompany = (payload?.company_name?.toString().trim() || payload?.company?.toString().trim()) || null;
+  const city       = payload?.city?.toString().trim() || null;
+  const state      = normState(payload?.state);
+  const country    = normCountry(payload?.country, state);
+  const website    = payload?.website?.toString().trim() || null;
+  const industry   = payload?.industry?.toString().trim() || null;
   const product_interest = payload?.product_interest?.toString().trim() || null;
   const message          = payload?.message?.toString().trim() || null;
   const page_url         = payload?.page_url?.toString().trim() || null;
   const form_type_detail = payload?.form_type_detail?.toString().trim() || null;
 
-  // Roller-spec fields
-  const roll_diameter           = payload?.roll_diameter?.toString().trim() || null;
-  const face_length             = payload?.face_length?.toString().trim() || null;
-  const current_roller_material = payload?.current_roller_material?.toString().trim() || null;
-  const environment             = payload?.environment?.toString().trim() || null;
-  const operating_temperature   = payload?.operating_temperature?.toString().trim() || null;
-  const line_speed              = payload?.line_speed?.toString().trim() || null;
-  const failure_description     = payload?.failure_description?.toString().trim() || null;
-  const timeline                = payload?.timeline?.toString().trim() || null;
-
-  // PDF download list
   const pdfs_requested: string[] = Array.isArray(payload?.pdfs_requested)
-    ? payload.pdfs_requested.map((s: any) => String(s).trim()).filter((s: string) => s.length > 0)
+    ? payload.pdfs_requested.map((s: any) => String(s).trim()).filter(Boolean)
     : [];
 
-  // Tier 2 / Tier 3 qualification fields
   const qualSpecFields = {
-    qual_issue_type: payload?.qual_issue_type?.toString().trim() || null,
-    qual_process_type: payload?.qual_process_type?.toString().trim() || null,
-    qual_current_solution: payload?.qual_current_solution?.toString().trim() || null,
-    qual_buying_role: payload?.qual_buying_role?.toString().trim() || null,
-    qual_urgency: payload?.qual_urgency?.toString().trim() || null,
-    spec_roll_type: payload?.spec_roll_type?.toString().trim() || null,
-    spec_roll_position: payload?.spec_roll_position?.toString().trim() || null,
-    spec_diameter: payload?.spec_diameter?.toString().trim() || null,
-    spec_face_length: payload?.spec_face_length?.toString().trim() || null,
-    spec_roll_material: payload?.spec_roll_material?.toString().trim() || null,
-    spec_substrate: payload?.spec_substrate?.toString().trim() || null,
-    spec_temperature: payload?.spec_temperature?.toString().trim() || null,
-    spec_line_speed: payload?.spec_line_speed?.toString().trim() || null,
-    spec_environment: payload?.spec_environment?.toString().trim() || null,
-    spec_failure_description: payload?.spec_failure_description?.toString().trim() || null,
-    spec_current_sleeve: payload?.spec_current_sleeve?.toString().trim() || null,
-    spec_failure_frequency: payload?.spec_failure_frequency?.toString().trim() || null,
-    spec_budget: payload?.budget?.toString().trim() || null,
-    spec_spare_available: payload?.spare_available?.toString().trim() || null,
-    spec_nip_pressure: payload?.nip_pressure?.toString().trim() || null,
-    spec_surface_finish: payload?.surface_finish?.toString().trim() || null,
-    spec_abrasion_concern: payload?.abrasion_concern?.toString().trim() || null,
-    spec_static_concern: payload?.static_concern?.toString().trim() || null,
-    spec_install_preference: payload?.install_preference?.toString().trim() || null,
-    spec_training_interest: payload?.training_interest?.toString().trim() || null,
+    qual_issue_type:         payload?.qual_issue_type?.toString().trim()         || null,
+    qual_process_type:       payload?.qual_process_type?.toString().trim()       || null,
+    qual_current_solution:   payload?.qual_current_solution?.toString().trim()   || null,
+    qual_buying_role:        payload?.qual_buying_role?.toString().trim()         || null,
+    qual_urgency:            payload?.qual_urgency?.toString().trim()             || null,
+    spec_roll_type:          payload?.spec_roll_type?.toString().trim()           || null,
+    spec_roll_position:      payload?.spec_roll_position?.toString().trim()       || null,
+    spec_diameter:           payload?.spec_diameter?.toString().trim()            || null,
+    spec_face_length:        payload?.spec_face_length?.toString().trim()         || null,
+    spec_roll_material:      payload?.spec_roll_material?.toString().trim()       || null,
+    spec_substrate:          payload?.spec_substrate?.toString().trim()           || null,
+    spec_temperature:        payload?.spec_temperature?.toString().trim()         || null,
+    spec_line_speed:         payload?.spec_line_speed?.toString().trim()          || null,
+    spec_environment:        payload?.spec_environment?.toString().trim()         || null,
+    spec_failure_description:payload?.spec_failure_description?.toString().trim() || null,
+    spec_current_sleeve:     payload?.spec_current_sleeve?.toString().trim()      || null,
+    spec_failure_frequency:  payload?.spec_failure_frequency?.toString().trim()   || null,
+    spec_budget:             payload?.budget?.toString().trim()                   || null,
+    spec_spare_available:    payload?.spare_available?.toString().trim()          || null,
+    spec_nip_pressure:       payload?.nip_pressure?.toString().trim()             || null,
+    spec_surface_finish:     payload?.surface_finish?.toString().trim()           || null,
+    spec_abrasion_concern:   payload?.abrasion_concern?.toString().trim()         || null,
+    spec_static_concern:     payload?.static_concern?.toString().trim()           || null,
+    spec_install_preference: payload?.install_preference?.toString().trim()       || null,
+    spec_training_interest:  payload?.training_interest?.toString().trim()        || null,
   };
 
-  const scoringPayload = {
-    ...payload,
-    company: rawCompany,
-    company_name: rawCompany,
-    first_name, last_name, full_name,
-    email, phone, title, product_interest, message, city, state,
-    roll_diameter, face_length, current_roller_material,
-    environment, operating_temperature, failure_description,
-    ...qualSpecFields,
-  };
+  const scoringPayload = { ...payload, company: rawCompany, company_name: rawCompany,
+    first_name, last_name, full_name, email, phone, title, product_interest, message,
+    city, state, ...qualSpecFields };
   const { score: mqlScore, tqlReady } = scoreLead(scoringPayload);
-  const dealStage = determineStage(form_type, mqlScore);
+
+  // pdf_download is always Prospect; contact form advances by score
+  const dealStage = form_type === "pdf_download" ? "prospect"
+    : mqlScore >= 55 ? "mql" : mqlScore >= 30 ? "contact" : "prospect";
 
   const personName = `${first_name} ${last_name}`.trim();
 
@@ -364,76 +233,48 @@ Deno.serve(async (req: Request) => {
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
-
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SERVICE_KEY  = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const crmOwner = "Matt Lippmann";
 
-  // ── Company upsert (skipped for pdf_download with no company) ───────────────
+  // ── Company upsert ────────────────────────────────────────────────────────
   let companyId: string | null = null;
   let canonicalName: string | null = null;
 
   if (rawCompany) {
     canonicalName = (city || state || country)
-      ? buildCompanyName(rawCompany, city, state, country)
-      : rawCompany;
-
-    const { data: byCanonical } = await supabase.from("companies").select("id")
-      .ilike("name", canonicalName).maybeSingle();
+      ? buildCompanyName(rawCompany, city, state, country) : rawCompany;
+    const { data: byCanonical } = await supabase.from("companies")
+      .select("id").ilike("name", canonicalName).maybeSingle();
     if (byCanonical) {
       companyId = byCanonical.id;
-      console.log("Company exists:", canonicalName);
     } else {
       const { data: newCo, error: coErr } = await supabase.from("companies")
-        .insert({
-          name: canonicalName,
-          city, state, country,
-          website,
-          industry_type: industry,
-          bd_owner: crmOwner,
-        })
+        .insert({ name: canonicalName, city, state, country, website, industry_type: industry, bd_owner: crmOwner })
         .select("id").single();
-      if (coErr) {
-        console.error("Company insert:", coErr);
-        return jsonResponse({ error: "DB error (company)", detail: coErr.message }, 500);
-      }
+      if (coErr) return jsonResp({ error: "DB error (company)", detail: coErr.message }, 500);
       companyId = newCo.id;
-      console.log("✓ Company created:", canonicalName);
     }
-  } else if (form_type === "pdf_download") {
-    console.log("pdf_download with no company — skipping company upsert");
-  } else {
+  } else if (form_type !== "pdf_download") {
     canonicalName = (city || state || country)
-      ? buildCompanyName(personName, city, state, country)
-      : personName;
-
-    const { data: byCanonical } = await supabase.from("companies").select("id")
-      .ilike("name", canonicalName).maybeSingle();
+      ? buildCompanyName(personName, city, state, country) : personName;
+    const { data: byCanonical } = await supabase.from("companies")
+      .select("id").ilike("name", canonicalName).maybeSingle();
     if (byCanonical) {
       companyId = byCanonical.id;
     } else {
       const { data: newCo, error: coErr } = await supabase.from("companies")
-        .insert({
-          name: canonicalName,
-          city, state, country,
-          website,
-          industry_type: industry,
-          bd_owner: crmOwner,
-        })
+        .insert({ name: canonicalName, city, state, country, website, industry_type: industry, bd_owner: crmOwner })
         .select("id").single();
-      if (coErr) {
-        console.error("Company insert:", coErr);
-        return jsonResponse({ error: "DB error (company)", detail: coErr.message }, 500);
-      }
+      if (coErr) return jsonResp({ error: "DB error (company)", detail: coErr.message }, 500);
       companyId = newCo.id;
     }
   }
 
-  // ── Upsert contact ──────────────────────────────────────────────────────────
+  // ── Contact upsert ────────────────────────────────────────────────────────
   let contactId: string | null = null;
-  if (email) {
-    const { data: byEmail } = await supabase.from("contacts").select("id")
-      .ilike("email", email).maybeSingle();
-    if (byEmail) contactId = byEmail.id;
-  }
+  const { data: byEmail } = await supabase.from("contacts").select("id").ilike("email", email).maybeSingle();
+  if (byEmail) contactId = byEmail.id;
   if (!contactId && companyId) {
     const { data: byNameCo } = await supabase.from("contacts").select("id")
       .ilike("name", personName).eq("company_id", companyId).maybeSingle();
@@ -441,80 +282,47 @@ Deno.serve(async (req: Request) => {
   }
   if (!contactId) {
     const { data: newC, error: cErr } = await supabase.from("contacts")
-      .insert({
-        name: personName, email, phone, title,
-        company_id: companyId, status: "prospect",
-        contact_type: "bd", owner: crmOwner,
-      })
+      .insert({ name: personName, email, phone, title, company_id: companyId,
+                status: "prospect", contact_type: "bd", owner: crmOwner })
       .select("id").single();
-    if (cErr) {
-      console.error("Contact insert:", cErr);
-    } else {
-      contactId = newC.id;
-      console.log("✓ Contact created:", personName);
-    }
+    if (!cErr) contactId = newC.id;
   }
 
-  // ── Build deal notes ────────────────────────────────────────────────────────
-  const notesLines: string[] = [];
-  notesLines.push(`Source: Fluoron Website (${form_type})`);
+  // ── Deal notes ────────────────────────────────────────────────────────────
+  const notesLines = [`Source: Fluoron Website (${form_type})`];
   if (product_interest) notesLines.push(`Product Interest: ${product_interest}`);
   if (message)          notesLines.push(`Message:\n${message}`);
-
-  const specSheet: string[] = [];
-  if (roll_diameter)           specSheet.push(`  Roll Diameter: ${roll_diameter}`);
-  if (face_length)             specSheet.push(`  Face Length: ${face_length}`);
-  if (current_roller_material) specSheet.push(`  Current Material: ${current_roller_material}`);
-  if (environment)             specSheet.push(`  Environment: ${environment}`);
-  if (operating_temperature)   specSheet.push(`  Operating Temperature: ${operating_temperature}`);
-  if (line_speed)              specSheet.push(`  Line Speed: ${line_speed}`);
-  if (failure_description)     specSheet.push(`  Failure Description: ${failure_description}`);
-  if (timeline)                specSheet.push(`  Timeline: ${timeline}`);
-  if (specSheet.length) notesLines.push(`Roller Specs:\n${specSheet.join("\n")}`);
-
   if (pdfs_requested.length) notesLines.push(`PDFs Requested: ${pdfs_requested.join(", ")}`);
   if (form_type_detail) notesLines.push(`Form Detail: ${form_type_detail}`);
   if (page_url)         notesLines.push(`Page: ${page_url}`);
   notesLines.push(`MQL Score: ${mqlScore}/100`);
   const dealNotes = notesLines.join("\n");
 
-  // ── Deal upsert ────────────────────────────────────────────────────────────
+  // ── Deal upsert ───────────────────────────────────────────────────────────
   let dealId: string | null = null;
   let duplicateDeal = false;
 
   if (companyId) {
     const { data: existingDeal } = await supabase.from("deals")
       .select("id,contact_id,lead_source,stage")
-      .eq("company_id", companyId)
-      .in("stage", ["prospect", "contact", "mql"])
-      .maybeSingle();
-
+      .eq("company_id", companyId).in("stage", ["prospect","contact","mql"]).maybeSingle();
     if (existingDeal) {
       dealId = existingDeal.id;
       duplicateDeal = true;
-      const updates: Record<string, any> = {};
+      const updates: Record<string, any> = { lead_source: "website", is_new_lead: true };
       if (contactId && !existingDeal.contact_id) updates.contact_id = contactId;
       const stageRank: Record<string, number> = { prospect: 0, contact: 1, mql: 2 };
-      if ((stageRank[dealStage] ?? 0) > (stageRank[existingDeal.stage] ?? 0)) {
-        updates.stage = dealStage;
-      }
+      if ((stageRank[dealStage] ?? 0) > (stageRank[existingDeal.stage] ?? 0)) updates.stage = dealStage;
       const { data: existingFull } = await supabase.from("deals")
         .select(Object.keys(qualSpecFields).concat(["tql_ready"]).join(","))
         .eq("id", dealId).maybeSingle();
       if (existingFull) {
         for (const [key, val] of Object.entries(qualSpecFields)) {
-          if (val && !(existingFull as any)[key]) {
-            updates[key] = val;
-          }
+          if (val && !(existingFull as any)[key]) updates[key] = val;
         }
-        if (tqlReady && !(existingFull as any).tql_ready) {
-          updates.tql_ready = true;
-        }
+        if (tqlReady && !(existingFull as any).tql_ready) updates.tql_ready = true;
       }
-      updates.lead_source = "website";
-      updates.is_new_lead = true;
       await supabase.from("deals").update(updates).eq("id", dealId);
-      console.log("Active deal exists for company — merged + flagged as website lead.");
     }
   }
 
@@ -522,114 +330,111 @@ Deno.serve(async (req: Request) => {
     const dealTitle = (form_type === "pdf_download" && !rawCompany)
       ? `${personName} — PDF Download Lead`
       : `${canonicalName ?? personName} — Website Lead`;
-
     const { data: newDeal, error: dErr } = await supabase.from("deals")
-      .insert({
-        title: dealTitle,
-        stage: dealStage,
-        company_id: companyId,
-        contact_id: contactId,
-        owner: crmOwner,
-        is_new_lead: true,
-        lead_source: "website",
-        notes: dealNotes,
-        ...qualSpecFields,
-        tql_ready: tqlReady,
-      })
+      .insert({ title: dealTitle, stage: dealStage, company_id: companyId, contact_id: contactId,
+                owner: crmOwner, is_new_lead: true, lead_source: "website", notes: dealNotes,
+                ...qualSpecFields, tql_ready: tqlReady })
       .select("id").single();
-    if (dErr) {
-      console.error("Deal insert:", dErr);
-      return jsonResponse({ error: "DB error (deal)", detail: dErr.message }, 500);
-    }
+    if (dErr) return jsonResp({ error: "DB error (deal)", detail: dErr.message }, 500);
     dealId = newDeal.id;
     console.log("✓ Deal created:", dealTitle, "stage=", dealStage);
   }
 
-  // ── Email: send PDFs (pdf_download) or follow-up (contact) ──────────────────
-  if (dealId) {
-    const { subject: emailSubject, body: emailBody, isPdfDelivery } = buildEmail({
-      formType: form_type,
-      firstName: first_name,
-      score: mqlScore,
-      payload: scoringPayload,
-      ownerName: crmOwner,
-      pdfsRequested: pdfs_requested,
-    });
+  // ── Email via web_inquiries → send-inquiry-reply (Brevo) ─────────────────
+  // For pdf_download: build PDF delivery email and auto-send via Brevo.
+  // For contact: insert draft into web_inquiries for human review (handle-web-inquiry handles those).
+  let emailSent = false;
+  let webInquiryId: string | null = null;
 
-    let emailSent = false;
-    let emailError = "";
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+  if (form_type === "pdf_download") {
+    const { subject: emailSubject, body: emailBody } = buildPdfEmail(first_name, pdfs_requested);
 
-    if (!resendApiKey) {
-      console.warn("RESEND_API_KEY not configured — email not sent. Set it via: supabase secrets set RESEND_API_KEY=re_...");
+    // Insert into web_inquiries
+    const { data: wiq, error: wiqErr } = await supabase.from("web_inquiries").insert({
+      name: personName,
+      first_name,
+      last_name,
+      email,
+      company:  rawCompany ?? "",
+      phone:    phone ?? "",
+      message:  pdfs_requested.length ? `PDFs requested: ${pdfs_requested.join(", ")}` : "PDF download",
+      form_fields: { ...payload, form_type: "pdf_download" },
+      ai_draft_subject: emailSubject,
+      ai_draft_body:    emailBody,
+      draft_status:     "pending_review",
+      product_interest: product_interest ?? "",
+      industry:         industry ?? "",
+      mql_score:        mqlScore,
+      tql_score:        0,
+      mql_tier2:        { qual_urgency: "", qual_issue_type: "", qual_buying_role: "",
+                          qual_process_type: "", qual_current_solution: "",
+                          mql_breakdown: { need: false, budget: false, timing: false,
+                                           identity: !!first_name, authority: false } },
+      tql_tier3:        { tql_filled_fields: [] },
+      utm_source:       payload?.utm_source ?? "",
+      utm_medium:       payload?.utm_medium ?? "",
+      utm_campaign:     payload?.utm_campaign ?? "",
+      prospect_company_id: companyId,
+      routing_status:   "unrouted",
+    }).select("id").single();
+
+    if (wiqErr) {
+      console.error("web_inquiries insert:", wiqErr);
     } else {
-      // From address: use info@spectrumadvanced.com (requires Resend domain verification for spectrumadvanced.com)
-      // Fallback: info@fluoron.com if spectrumadvanced.com domain not verified in Resend
-      const fromAddress = "Fluoron <info@spectrumadvanced.com>";
+      webInquiryId = wiq.id;
+      console.log("✓ web_inquiries record created:", webInquiryId);
 
+      // Fire send-inquiry-reply to deliver via Brevo immediately
       try {
-        const resendResp = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: fromAddress,
-            to: [email],
-            subject: emailSubject,
-            text: emailBody,
-          }),
-        });
-
-        if (resendResp.ok) {
-          const result = await resendResp.json().catch(() => ({}));
+        const sendResp = await fetch(
+          `${SUPABASE_URL}/functions/v1/send-inquiry-reply`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":  "application/json",
+              "Authorization": `Bearer ${SERVICE_KEY}`,
+              "apikey":        SERVICE_KEY,
+            },
+            body: JSON.stringify({ inquiry_id: webInquiryId }),
+          }
+        );
+        const sendResult = await sendResp.json().catch(() => ({}));
+        if (sendResp.ok && sendResult?.message_id) {
           emailSent = true;
-          console.log(
-            isPdfDelivery ? "✓ PDF delivery email sent:" : "✓ Follow-up email sent:",
-            result?.id ?? "(no id)",
-            "→", email
-          );
+          console.log("✓ PDF delivery email sent via Brevo:", sendResult.message_id, "→", email);
         } else {
-          const errBody = await resendResp.text().catch(() => "");
-          emailError = `${resendResp.status}: ${errBody}`;
-          console.error("Resend send failed:", emailError);
+          console.error("send-inquiry-reply failed:", sendResp.status, JSON.stringify(sendResult));
         }
       } catch (err) {
-        emailError = String(err);
-        console.error("Resend send threw:", err);
+        console.error("send-inquiry-reply threw:", err);
       }
     }
 
-    // Activity: subject reflects whether the email actually went out
-    const activitySubject = emailSent
-      ? (isPdfDelivery ? `PDF delivery sent — ${pdfs_requested.join(", ")}` : "Follow-up email sent")
-      : (isPdfDelivery
-          ? `Draft PDF delivery — ${pdfs_requested.join(", ") || form_type}`
-          : `Draft follow-up email — ${form_type}`);
-
-    await supabase.from("activities").insert({
-      deal_id: dealId, company_id: companyId, contact_id: contactId,
-      type: "email",
-      subject: activitySubject,
-      body: emailBody,
-      from_email: emailSent ? "info@spectrumadvanced.com" : null,
-      to_email: emailSent ? email : null,
-      logged_by: crmOwner,
-      direction: "outbound",
-      occurred_at: new Date().toISOString(),
-      assigned_to: crmOwner,
-    });
-    console.log(`✓ Activity logged (${emailSent ? "sent" : "draft"}):`, activitySubject);
+    // Log activity on the deal
+    if (dealId) {
+      const actSubject = emailSent
+        ? `PDF delivery sent — ${pdfs_requested.join(", ")}`
+        : `Draft PDF delivery — ${pdfs_requested.join(", ") || "pdf_download"}`;
+      await supabase.from("activities").insert({
+        deal_id: dealId, company_id: companyId, contact_id: contactId,
+        type: "email", subject: actSubject, body: emailSent ? "Sent via Brevo" : "Draft — not yet sent",
+        from_email: emailSent ? "info@spectrumadvanced.com" : null,
+        to_email:   emailSent ? email : null,
+        logged_by: crmOwner, direction: "outbound",
+        occurred_at: new Date().toISOString(), assigned_to: crmOwner,
+      });
+    }
   }
 
-  return jsonResponse({
+  return jsonResp({
     ok: true,
     company: canonicalName,
     contact: personName,
     stage: dealStage,
     mql_score: mqlScore,
     deal_id: dealId,
+    web_inquiry_id: webInquiryId,
+    email_sent: emailSent,
     duplicate_deal: duplicateDeal,
   });
 });
