@@ -4,12 +4,35 @@
  *
  * Two form types:
  *   - pdf_download : minimal data (name + email), always Prospect stage
+ *                   → sends the requested PDFs immediately via Resend
  *   - contact      : MQL-scoreable, auto-advances to Connected (contact) or MQL
+ *                   → sends a follow-up / qualification email
  *
  * Creates company / contact / deal / activity with lead_source='website'.
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+// ── PDF catalogue — label (as sent by form) → public URL ─────────────────────
+const PDF_MAP: Record<string, string> = {
+  "Spectrum Advanced Capability Statement":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_CapabilityDoc_Final_Feb26-1-comp.pdf",
+  "Fluoron Heat Shrink Fluoropolymer Sleeves":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Fluoron_FullOfferingLeaveBehind_FinalComp_March26.pdf",
+  "Fluoron Flexible Packaging Roll Cover Guide":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_FlexPackagingDoc_Final_March26comp-2.pdf",
+  "Spectrum Advanced PFAS Statement":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PFASStatement_Finalcomp_March26.pdf",
+  // Legacy / alias labels (in case the form ever shipped alternate text)
+  "Fluoron Capability Statement":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_CapabilityDoc_Final_Feb26-1-comp.pdf",
+  "Heat Shrink Fluoropolymer Sleeves":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Fluoron_FullOfferingLeaveBehind_FinalComp_March26.pdf",
+  "PFAS Statement":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PFASStatement_Finalcomp_March26.pdf",
+  "Flexible Packaging Roll Cover Guide":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_FlexPackagingDoc_Final_March26comp-2.pdf",
+};
 
 // ── State / Province / Country lookup tables ──────────────────────────────────
 const US_STATES: Record<string, string> = {
@@ -70,19 +93,16 @@ function buildCompanyName(name: string, city: string | null, state: string | nul
 // ── MQL scoring ──────────────────────────────────────────────────────────────
 function scoreLead(payload: any): { score: number; tqlReady: boolean } {
   let score = 0;
-  // Tier 1
   if (payload.first_name || payload.full_name) score += 10;
   if (payload.email) score += 20;
   if (payload.company || payload.company_name) score += 20;
   if (payload.phone) score += 5;
   if (payload.title) score += 5;
-  // Tier 2 — MQL
   if (payload.qual_issue_type) score += 15;
   if (payload.qual_process_type) score += 10;
   if (payload.qual_current_solution) score += 10;
   if (payload.qual_urgency) score += 10;
   if (payload.qual_buying_role) score += 5;
-  // Tier 3 — TQL
   const specFields = [
     "spec_roll_type","spec_roll_position","spec_diameter","spec_face_length",
     "spec_roll_material","spec_substrate","spec_temperature","spec_line_speed",
@@ -95,8 +115,6 @@ function scoreLead(payload: any): { score: number; tqlReady: boolean } {
 }
 
 // ── Stage routing ────────────────────────────────────────────────────────────
-// Note: the deals table uses "prospect" for raw leads, "contact" for the
-// "connected" tier of the BD pipeline, and "mql" for marketing-qualified leads.
 function determineStage(formType: string, score: number): string {
   if (formType === "pdf_download") return "prospect";
   if (score >= 55) return "mql";
@@ -104,38 +122,60 @@ function determineStage(formType: string, score: number): string {
   return "prospect";
 }
 
-// ── Follow-up email drafting ─────────────────────────────────────────────────
-function draftFollowUpEmail(opts: {
+// ── Email builder ─────────────────────────────────────────────────────────────
+function buildEmail(opts: {
   formType: string;
   firstName: string;
   score: number;
   payload: any;
   ownerName: string;
-}): { subject: string; body: string } {
-  const { formType, firstName, score, payload, ownerName } = opts;
+  pdfsRequested: string[];
+}): { subject: string; body: string; isPdfDelivery: boolean } {
+  const { formType, firstName, score, payload, ownerName, pdfsRequested } = opts;
 
+  // ── PDF Download: send the actual documents ─────────────────────────────
   if (formType === "pdf_download") {
     const subject = "Your Fluoron Technical Literature";
+
+    // Build per-PDF download lines
+    const pdfLines: string[] = [];
+    const missing: string[] = [];
+    for (const label of pdfsRequested) {
+      const url = PDF_MAP[label];
+      if (url) {
+        pdfLines.push(`• ${label}\n  ${url}`);
+      } else {
+        missing.push(label);
+        pdfLines.push(`• ${label}\n  (see https://fluoron.com/resources/)`);
+      }
+    }
+    if (missing.length) {
+      console.warn("PDF labels not found in PDF_MAP:", missing.join(", "));
+    }
+
+    const docBlock = pdfLines.length
+      ? pdfLines.join("\n\n")
+      : "• All Fluoron Resources\n  https://fluoron.com/resources/";
+
     const body =
-`Subject: ${subject}
+`Hi ${firstName},
 
-Hi ${firstName},
+Here are the Fluoron documents you requested — click to download directly:
 
-Thank you for downloading our technical literature! We hope it gives you a good overview of our fluoropolymer sleeve capabilities.
+${docBlock}
 
-To make sure we connect you with the right resources, could you share a couple of quick details?
-1. What company are you with and what industry?
-2. Which product are you evaluating? (FEP, PFA, PTFE, or Conductive PTFE)
-3. What challenge are you trying to solve? (release, wear, corrosion, buildup, contamination, etc.)
+These are direct download links; no login or account needed.
 
-If you'd prefer to speak directly with an engineer, call us at (800) XXX-XXXX or simply reply to this email.
+If you'd like to discuss your application or get a product recommendation, reply to this email or call us at (410) 392-0220.
 
 Best regards,
-The Fluoron Team`;
-    return { subject, body };
+The Fluoron Team
+Spectrum Advanced | info@spectrumadvanced.com | (410) 392-0220`;
+
+    return { subject, body, isPdfDelivery: true };
   }
 
-  // Contact form
+  // ── Contact form: qualification follow-up ──────────────────────────────
   if (score >= 55) {
     const productLabel = (payload.product_interest && payload.product_interest.trim())
       ? payload.product_interest.trim()
@@ -157,9 +197,7 @@ The Fluoron Team`;
       : "";
 
     const body =
-`Subject: ${subject}
-
-Hi ${firstName},
+`Hi ${firstName},
 
 Thank you for the detailed inquiry! Our engineering team has received your request and will follow up within one business day with a product recommendation.
 ${specsBlock}
@@ -168,7 +206,7 @@ If anything changes or you have additional specs to share, just reply.
 Best regards,
 ${ownerName}
 Spectrum Advanced / Fluoron`;
-    return { subject, body };
+    return { subject, body, isPdfDelivery: false };
   }
 
   // Contact form, score < 55
@@ -186,18 +224,16 @@ Spectrum Advanced / Fluoron`;
     : "";
 
   const body =
-`Subject: ${subject}
-
-Hi ${firstName},
+`Hi ${firstName},
 
 Thank you for reaching out! We received your message and want to make sure we get you the right recommendation.
 ${missingBlock}
-If you'd prefer to talk through it live, call us at (800) XXX-XXXX.
+If you'd prefer to talk through it live, call us at (410) 392-0220.
 
 Best regards,
 ${ownerName}
 Spectrum Advanced / Fluoron`;
-  return { subject, body };
+  return { subject, body, isPdfDelivery: false };
 }
 
 const CORS_HEADERS: Record<string, string> = {
@@ -229,7 +265,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON" }, 400);
   }
 
-  // ── Name handling: support full_name as alias for first_name + last_name ──
+  // ── Name handling: support full_name as alias ────────────────────────────
   let first_name = (payload?.first_name ?? "").toString().trim();
   let last_name  = (payload?.last_name  ?? "").toString().trim();
   const full_name = (payload?.full_name ?? "").toString().trim();
@@ -245,7 +281,6 @@ Deno.serve(async (req: Request) => {
   if (!first_name || !email) {
     return jsonResponse({ error: "first_name (or full_name) and email are required" }, 400);
   }
-  // last_name optional when full_name only has one token
   if (!last_name) last_name = "";
 
   const form_type = (payload?.form_type ?? "").toString().trim() || "contact";
@@ -253,7 +288,6 @@ Deno.serve(async (req: Request) => {
   // ── Common fields ────────────────────────────────────────────────────────
   const phone   = payload?.phone?.toString().trim() || null;
   const title   = payload?.title?.toString().trim() || null;
-  // "company" is an alias for "company_name"
   const rawCompany =
     (payload?.company_name?.toString().trim() || payload?.company?.toString().trim()) || null;
   const city    = payload?.city?.toString().trim() || null;
@@ -267,7 +301,7 @@ Deno.serve(async (req: Request) => {
   const page_url         = payload?.page_url?.toString().trim() || null;
   const form_type_detail = payload?.form_type_detail?.toString().trim() || null;
 
-  // Roller-spec fields (free-form)
+  // Roller-spec fields
   const roll_diameter           = payload?.roll_diameter?.toString().trim() || null;
   const face_length             = payload?.face_length?.toString().trim() || null;
   const current_roller_material = payload?.current_roller_material?.toString().trim() || null;
@@ -277,12 +311,12 @@ Deno.serve(async (req: Request) => {
   const failure_description     = payload?.failure_description?.toString().trim() || null;
   const timeline                = payload?.timeline?.toString().trim() || null;
 
-  // PDF download fields
+  // PDF download list
   const pdfs_requested: string[] = Array.isArray(payload?.pdfs_requested)
     ? payload.pdfs_requested.map((s: any) => String(s).trim()).filter((s: string) => s.length > 0)
     : [];
 
-  // ── Tier 2 / Tier 3 qualification fields (structured) ───────────────────────
+  // Tier 2 / Tier 3 qualification fields
   const qualSpecFields = {
     qual_issue_type: payload?.qual_issue_type?.toString().trim() || null,
     qual_process_type: payload?.qual_process_type?.toString().trim() || null,
@@ -311,7 +345,6 @@ Deno.serve(async (req: Request) => {
     spec_training_interest: payload?.training_interest?.toString().trim() || null,
   };
 
-  // Normalised payload for scoring (so aliases work cleanly)
   const scoringPayload = {
     ...payload,
     company: rawCompany,
@@ -368,7 +401,6 @@ Deno.serve(async (req: Request) => {
   } else if (form_type === "pdf_download") {
     console.log("pdf_download with no company — skipping company upsert");
   } else {
-    // Contact form with no company: fall back to person's name as company
     canonicalName = (city || state || country)
       ? buildCompanyName(personName, city, state, country)
       : personName;
@@ -444,14 +476,9 @@ Deno.serve(async (req: Request) => {
   if (form_type_detail) notesLines.push(`Form Detail: ${form_type_detail}`);
   if (page_url)         notesLines.push(`Page: ${page_url}`);
   notesLines.push(`MQL Score: ${mqlScore}/100`);
-
-  if (form_type === "pdf_download" && !rawCompany) {
-    notesLines.push("---");
-    notesLines.push("No company or product context provided. Follow-up email drafted.");
-  }
   const dealNotes = notesLines.join("\n");
 
-  // ── Deal: skip duplicate if an active deal already exists for this company ──
+  // ── Deal upsert ────────────────────────────────────────────────────────────
   let dealId: string | null = null;
   let duplicateDeal = false;
 
@@ -467,12 +494,10 @@ Deno.serve(async (req: Request) => {
       duplicateDeal = true;
       const updates: Record<string, any> = {};
       if (contactId && !existingDeal.contact_id) updates.contact_id = contactId;
-      // Promote stage if new submission scores higher
       const stageRank: Record<string, number> = { prospect: 0, contact: 1, mql: 2 };
       if ((stageRank[dealStage] ?? 0) > (stageRank[existingDeal.stage] ?? 0)) {
         updates.stage = dealStage;
       }
-      // Overwrite null qual_*/spec_* fields with values from new submission
       const { data: existingFull } = await supabase.from("deals")
         .select(Object.keys(qualSpecFields).concat(["tql_ready"]).join(","))
         .eq("id", dealId).maybeSingle();
@@ -486,8 +511,6 @@ Deno.serve(async (req: Request) => {
           updates.tql_ready = true;
         }
       }
-      // Always surface in Web Inquiries — flag as new website lead so it
-      // appears in the /inquiries review queue regardless of prior lead_source.
       updates.lead_source = "website";
       updates.is_new_lead = true;
       await supabase.from("deals").update(updates).eq("id", dealId);
@@ -522,24 +545,28 @@ Deno.serve(async (req: Request) => {
     console.log("✓ Deal created:", dealTitle, "stage=", dealStage);
   }
 
-  // ── Activity: follow-up email (sent via Resend, or drafted if unavailable) ──
+  // ── Email: send PDFs (pdf_download) or follow-up (contact) ──────────────────
   if (dealId) {
-    const { subject: emailSubject, body: emailBodyRaw } = draftFollowUpEmail({
+    const { subject: emailSubject, body: emailBody, isPdfDelivery } = buildEmail({
       formType: form_type,
       firstName: first_name,
       score: mqlScore,
       payload: scoringPayload,
       ownerName: crmOwner,
+      pdfsRequested: pdfs_requested,
     });
 
-    // Strip the leading "Subject: ...\n\n" line — that's for activity display only.
-    const emailBody = emailBodyRaw.replace(/^Subject:[^\n]*\n\n?/, "");
-
     let emailSent = false;
+    let emailError = "";
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
+
     if (!resendApiKey) {
-      console.warn("RESEND_API_KEY missing — skipping email send, logging draft only.");
+      console.warn("RESEND_API_KEY not configured — email not sent. Set it via: supabase secrets set RESEND_API_KEY=re_...");
     } else {
+      // From address: use info@spectrumadvanced.com (requires Resend domain verification for spectrumadvanced.com)
+      // Fallback: info@fluoron.com if spectrumadvanced.com domain not verified in Resend
+      const fromAddress = "Fluoron <info@spectrumadvanced.com>";
+
       try {
         const resendResp = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -548,39 +575,52 @@ Deno.serve(async (req: Request) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "Fluoron <info@fluoron.com>",
+            from: fromAddress,
             to: [email],
             subject: emailSubject,
             text: emailBody,
           }),
         });
+
         if (resendResp.ok) {
           const result = await resendResp.json().catch(() => ({}));
           emailSent = true;
-          console.log("✓ Resend email sent:", result?.id ?? "(no id)");
+          console.log(
+            isPdfDelivery ? "✓ PDF delivery email sent:" : "✓ Follow-up email sent:",
+            result?.id ?? "(no id)",
+            "→", email
+          );
         } else {
           const errBody = await resendResp.text().catch(() => "");
-          console.error("Resend send failed:", resendResp.status, errBody);
+          emailError = `${resendResp.status}: ${errBody}`;
+          console.error("Resend send failed:", emailError);
         }
       } catch (err) {
+        emailError = String(err);
         console.error("Resend send threw:", err);
       }
     }
 
+    // Activity: subject reflects whether the email actually went out
     const activitySubject = emailSent
-      ? "Follow-up email sent"
-      : `Draft follow-up email — ${form_type}`;
+      ? (isPdfDelivery ? `PDF delivery sent — ${pdfs_requested.join(", ")}` : "Follow-up email sent")
+      : (isPdfDelivery
+          ? `Draft PDF delivery — ${pdfs_requested.join(", ") || form_type}`
+          : `Draft follow-up email — ${form_type}`);
 
     await supabase.from("activities").insert({
       deal_id: dealId, company_id: companyId, contact_id: contactId,
       type: "email",
       subject: activitySubject,
       body: emailBody,
+      from_email: emailSent ? "info@spectrumadvanced.com" : null,
+      to_email: emailSent ? email : null,
       logged_by: crmOwner,
+      direction: "outbound",
       occurred_at: new Date().toISOString(),
       assigned_to: crmOwner,
     });
-    console.log(`✓ Activity logged (${emailSent ? "sent" : "draft"}):`, emailSubject);
+    console.log(`✓ Activity logged (${emailSent ? "sent" : "draft"}):`, activitySubject);
   }
 
   return jsonResponse({
