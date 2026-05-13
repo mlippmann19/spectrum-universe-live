@@ -411,22 +411,20 @@ window.addEventListener('scroll',()=>{
   const ORBITS=[
     { r:0.168, spd:0.095, tx:65, ty:15,     // inner — deliberate, still slightly faster
       planets:[
-        {lbl:'Prospector',    a:0,       sz:8.2,  col:'#00c8e8', trail:[], moons:[]},
-        {lbl:'Web Inquiries', a:Math.PI, sz:7.0,col:'#5eb8f0', trail:[], moons:[]},
+        {lbl:'PROSPECTS', a:0,       sz:8.8,  col:'#00c8e8', trail:[], moons:[]},
+        {lbl:'CRM',       a:Math.PI, sz:7.8,  col:'#5eb8f0', trail:[], moons:[]},
       ]
     },
     { r:0.276, spd:0.062, tx:77, ty:-25,    // middle — measured
       planets:[
-        {lbl:'BD',         a:0.4,    sz:15.5, col:'#f59e0b', trail:[], moons:[{a:1.2,spd:0.11,or:22,sz:2.7,col:'#d4943a'}]},
-        {lbl:'Quotes',     a:2.5,    sz:9.5,col:'#a78bfa', trail:[], moons:[]},
-        {lbl:'Companies',   a:4.6,    sz:8.5,col:'#34d399', trail:[], moons:[]},
+        {lbl:'OPS',       a:0.4,    sz:15.5, col:'#f59e0b', trail:[], moons:[{a:1.2,spd:0.11,or:22,sz:2.7,col:'#d4943a'}]},
+        {lbl:'ANALYTICS', a:2.5,    sz:9.5,  col:'#a78bfa', trail:[], moons:[]},
+        {lbl:'SERVICE',   a:4.6,    sz:8.8,  col:'#34d399', trail:[], moons:[]},
       ]
     },
     { r:0.40,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
       planets:[
-        {lbl:'ERP',        a:0.2,  sz:20, col:'#fb923c', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:32,sz:3.0,col:'#c47840'},{a:2.1,spd:0.05,or:43,sz:2.2,col:'#8a5a30'}]},
-        {lbl:'SIOP',       a:2.3,  sz:12.5, col:'#e2e8f0', trail:[], moons:[{a:1.5,spd:0.09,or:21,sz:2.2,col:'#a0aab8'}]},
-        {lbl:'Operations', a:4.4,  sz:9.5,col:'#fbbf24', trail:[], moons:[]},
+        {lbl:'ERP',       a:0.2,  sz:20, col:'#fb923c', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:32,sz:3.0,col:'#c47840'},{a:2.1,spd:0.05,or:43,sz:2.2,col:'#8a5a30'}]},
       ]
     },
   ];
@@ -434,28 +432,22 @@ window.addEventListener('scroll',()=>{
   const TRAIL=3;
   let T=0, gRot=0;
   const LABELS={
-    'Prospector':'Prospector',
-    'Web Inquiries':'Web Inquiries',
-    'BD':'BD',
-    'Quotes':'Quotes',
-    'Companies':'Companies',
-    'Contacts':'Contacts',
-    'SIOP':'SIOP',
-    'Operations':'Operations',
-    'ERP':'ERP'
+    'PROSPECTS':'PROSPECTS',
+    'CRM':'CRM',
+    'OPS':'OPS',
+    'ERP':'ERP',
+    'SERVICE':'SERVICE',
+    'ANALYTICS':'ANALYTICS'
   };
   const LABEL_TUNING={
-    'Prospector':{dx:16,dy:-12,anchor:'left'},
-    'Web Inquiries':{dx:-18,dy:2,anchor:'right'},
-    'BD':{dx:16,dy:15,anchor:'left'},
-    'Quotes':{dx:-14,dy:16,anchor:'right'},
-    'Companies':{dx:14,dy:-8,anchor:'left'},
-    'Contacts':{dx:-12,dy:-8,anchor:'right'},
-    'SIOP':{dx:0,dy:22,anchor:'center'},
-    'Operations':{dx:16,dy:-10,anchor:'left'},
+    'PROSPECTS':{dx:16,dy:-12,anchor:'left'},
+    'CRM':{dx:-18,dy:2,anchor:'right'},
+    'OPS':{dx:16,dy:14,anchor:'left'},
+    'SERVICE':{dx:14,dy:-8,anchor:'left'},
+    'ANALYTICS':{dx:-14,dy:16,anchor:'right'},
     'ERP':{dx:12,dy:4,anchor:'left'}
   };
-  const MOBILE_LABELS=new Set(['Prospector','Web Inquiries','BD','Quotes','Companies','SIOP','ERP']);
+  const MOBILE_LABELS=new Set(['PROSPECTS','CRM','OPS','ERP','SERVICE','ANALYTICS']);
 
   function roundRectPath(x,y,w,h,r){
     const rr=Math.min(r,w/2,h/2);
