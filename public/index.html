@@ -462,26 +462,40 @@ window.addEventListener('scroll',()=>{
     const pts=[];
     const add=(x,y,density=1)=>{
       const bottomWeight=Math.max(0,Math.min(1,(y-18)/34));
-      const count=Math.round((1.2+density*3.45)*(0.38+bottomWeight*1.02));
+      const count=Math.round((1.3+density*3.8)*(0.34+bottomWeight*1.18));
       for(let n=0;n<count;n++){
         pts.push({
-          x:x+(Math.random()-.5)*3.4,
-          y:y+(Math.random()-.5)*3.4,
+          x:x+(Math.random()-.5)*4.4,
+          y:y+(Math.random()-.5)*4.2,
           base:bottomWeight,
-          size:.18+Math.random()*(.36+bottomWeight*.48),
+          size:.16+Math.random()*(.34+bottomWeight*.50),
           phase:Math.random()*Math.PI*2,
-          drift:.55+Math.random()*1.55,
-          alpha:.14+bottomWeight*.34+Math.random()*.16
+          drift:.70+Math.random()*1.95,
+          alpha:.18+bottomWeight*.38+Math.random()*.18
         });
       }
     };
     // Sparse rising legs: density deliberately evaporates toward the top.
-    for(let i=0;i<=58;i++){
-      const t=i/54;
-      const y=10+t*28;
-      const density=.18+t*.88;
-      if(Math.random()<.46+t*.48) add(15.0,y,density);
-      if(Math.random()<.46+t*.48) add(37.0,y,density);
+    for(let i=0;i<=68;i++){
+      const t=i/68;
+      const y=3.5+t*35.0;
+      const density=.28+t*.92;
+      if(Math.random()<.62+t*.34) add(15.0,y,density);
+      if(Math.random()<.62+t*.34) add(37.0,y,density);
+    }
+    // A few isolated white particles at the top so the U dissolves upward instead of stopping.
+    for(const x of [15.0,37.0]){
+      for(let i=0;i<12;i++){
+        pts.push({
+          x:x+(Math.random()-.5)*5.8,
+          y:1.5+Math.random()*9.5,
+          base:0,
+          size:.14+Math.random()*.24,
+          phase:Math.random()*Math.PI*2,
+          drift:1.1+Math.random()*2.2,
+          alpha:.16+Math.random()*.22
+        });
+      }
     }
     // Dense lower curve, where the U visually anchors.
     for(let i=0;i<=116;i++){
@@ -642,12 +656,12 @@ window.addEventListener('scroll',()=>{
     ctx.save();
     ctx.globalCompositeOperation='screen';
     // Soft solar halo that breathes around the U instead of a hard edge.
-    const corona=ctx.createRadialGradient(CX,CY,SR*.72,CX,CY,SR*3.35);
-    corona.addColorStop(0,'rgba(185,255,255,.10)');
-    corona.addColorStop(.26,'rgba(70,240,246,.16)');
-    corona.addColorStop(.58,'rgba(0,184,217,.08)');
+    const corona=ctx.createRadialGradient(CX,CY,SR*.72,CX,CY,SR*3.15);
+    corona.addColorStop(0,'rgba(185,255,255,.055)');
+    corona.addColorStop(.26,'rgba(70,240,246,.085)');
+    corona.addColorStop(.58,'rgba(0,184,217,.045)');
     corona.addColorStop(1,'rgba(0,184,217,0)');
-    ctx.beginPath();ctx.arc(CX,CY,SR*3.35,0,Math.PI*2);ctx.fillStyle=corona;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,SR*3.15,0,Math.PI*2);ctx.fillStyle=corona;ctx.fill();
     // Curving magnetic-field wisps.
     for(let i=0;i<18;i++){
       const a=(i/18)*Math.PI*2+now*.035*(i%2?1:-1);
@@ -660,9 +674,9 @@ window.addEventListener('scroll',()=>{
       const c1y=CY+Math.sin(a)*SR*(1.05+.2*Math.cos(now+i));
       const c2x=CX+side*SR*1.72;
       const c2y=ey-Math.cos(a)*SR*.35;
-      const alpha=.055+.035*Math.sin(now*.65+i);
-      ctx.strokeStyle=`rgba(130,245,255,${Math.max(.025,alpha)})`;
-      ctx.lineWidth=.55+(i%3)*.18;
+      const alpha=.032+.024*Math.sin(now*.65+i);
+      ctx.strokeStyle=`rgba(130,245,255,${Math.max(.014,alpha)})`;
+      ctx.lineWidth=.42+(i%3)*.14;
       ctx.beginPath();
       ctx.moveTo(sx,sy);
       ctx.bezierCurveTo(c1x,c1y,c2x,c2y,ex,ey);
@@ -678,21 +692,22 @@ window.addEventListener('scroll',()=>{
     ctx.globalCompositeOperation='screen';
 
     // Particle-only U: dense, brighter bottom; sparse, evaporating top.
-    const halo=ctx.createRadialGradient(CX,CY+SR*.18,SR*.18,CX,CY,SR*2.6);
-    halo.addColorStop(0,'rgba(210,255,255,.18)');
-    halo.addColorStop(.34,'rgba(62,242,242,.16)');
-    halo.addColorStop(.72,'rgba(0,184,217,.08)');
+    const halo=ctx.createRadialGradient(CX,CY+SR*.18,SR*.18,CX,CY,SR*2.25);
+    halo.addColorStop(0,'rgba(210,255,255,.07)');
+    halo.addColorStop(.34,'rgba(62,242,242,.075)');
+    halo.addColorStop(.72,'rgba(0,184,217,.035)');
     halo.addColorStop(1,'rgba(0,184,217,0)');
-    ctx.beginPath();ctx.arc(CX,CY,SR*2.6,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,SR*2.25,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
 
     for(const p of U_PARTICLES){
       const topFade=Math.max(0,Math.min(1,(p.y-8)/42));
       const shimmer=.72+.28*Math.sin(now*(1.15+p.drift*.2)+p.phase);
-      const breathe=Math.sin(now*.85+p.phase)*p.drift;
-      const px=ox+(p.x + Math.cos(now*.55+p.phase)*.42 + breathe*.16)*scale;
-      const py=oy+(p.y + Math.sin(now*.7+p.phase)*.50)*scale;
+      const breathe=Math.sin(now*.9+p.phase)*p.drift;
+      const centerPull=(p.x<26?-1:1);
+      const px=ox+(p.x + Math.cos(now*.6+p.phase)*.62 + breathe*.22 + centerPull*Math.sin(now*.42+p.phase)*.38)*scale;
+      const py=oy+(p.y + Math.sin(now*.76+p.phase)*.72 - Math.max(0,1-topFade)*Math.sin(now*.55+p.phase)*.35)*scale;
       const sz=p.size*scale*(.72+.28*shimmer);
-      const alpha=p.alpha*(.36+topFade*.82)*shimmer;
+      const alpha=p.alpha*(.52+topFade*.78)*shimmer;
       const g=ctx.createRadialGradient(px,py,0,px,py,sz*1.75);
       g.addColorStop(0,`rgba(238,255,255,${Math.min(.72,alpha+.10)})`);
       g.addColorStop(.42,`rgba(105,252,252,${alpha*.50})`);
@@ -704,7 +719,7 @@ window.addEventListener('scroll',()=>{
       if(p.base>.55){
         ctx.beginPath();
         ctx.arc(px,py,Math.max(.22,sz*.42),0,Math.PI*2);
-        ctx.fillStyle=`rgba(245,255,255,${alpha*.48})`;
+        ctx.fillStyle=`rgba(245,255,255,${alpha*.50})`;
         ctx.fill();
       }
     }
@@ -737,7 +752,7 @@ window.addEventListener('scroll',()=>{
     const all=[];
     for(const orb of ORBITS){
       for(const pl of orb.planets){
-        pl.a += orb.spd * 0.0011; // slow, inevitable progress
+        pl.a += orb.spd * 0.00135; // slow, inevitable progress with slightly more life
         const p=proj(pl.a, orb.r*S, orb.tx, orb.ty+gRot*57.3);
         pl.trail.push({px:p.px,py:p.py});
         if(pl.trail.length>TRAIL) pl.trail.shift();
@@ -767,20 +782,12 @@ window.addEventListener('scroll',()=>{
       ctx.fillStyle='rgba(0,184,217,0.9)';ctx.fill();
       ctx.restore();
 
-      // Center sphere
-      const cg=ctx.createRadialGradient(CX-SR*.3,CY-SR*.32,SR*.05,CX,CY,SR);
-      cg.addColorStop(0,'#5ae0f4');cg.addColorStop(0.45,'#0d7a9a');cg.addColorStop(1,'#021e2e');
-      ctx.save();ctx.shadowColor='#00b8d9';ctx.shadowBlur=28;
-      ctx.beginPath();ctx.arc(CX,CY,SR,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
-      ctx.restore();
-      // Dark side
-      const dg=ctx.createRadialGradient(CX+SR*.3,CY+SR*.3,0,CX+SR*.1,CY+SR*.1,SR*1.1);
-      dg.addColorStop(0.3,'rgba(0,0,0,0)');dg.addColorStop(1,'rgba(0,0,0,0.6)');
-      ctx.beginPath();ctx.arc(CX,CY,SR,0,Math.PI*2);ctx.fillStyle=dg;ctx.fill();
-      // Specular
-      const sg=ctx.createRadialGradient(CX-SR*.38,CY-SR*.38,0,CX-SR*.3,CY-SR*.3,SR*.5);
-      sg.addColorStop(0,'rgba(255,255,255,0.28)');sg.addColorStop(1,'rgba(255,255,255,0)');
-      ctx.beginPath();ctx.arc(CX,CY,SR,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+      // No hard central circle: just a subdued depth shadow so the particle-U remains the object.
+      const voidGlow=ctx.createRadialGradient(CX,CY,SR*.18,CX,CY,SR*1.28);
+      voidGlow.addColorStop(0,'rgba(5,42,56,.30)');
+      voidGlow.addColorStop(.72,'rgba(2,15,26,.18)');
+      voidGlow.addColorStop(1,'rgba(2,15,26,0)');
+      ctx.beginPath();ctx.arc(CX,CY,SR*1.28,0,Math.PI*2);ctx.fillStyle=voidGlow;ctx.fill();
 
       // Central "U"
       drawCapacitorMark(CX,CY,SR,now);
