@@ -446,14 +446,15 @@ window.addEventListener('scroll',()=>{
     {txt:'SHIP NOTICE',x:.12,y:.58,period:29,delay:12.5},
     {txt:'CASH COLLECTED',x:.66,y:.62,period:33,delay:18.0}
   ];
-  const SOLAR_WIND=Array.from({length:96},(_,i)=>({
-    a:(Math.random()-.5)*1.15,
-    lane:(i%13-6)/6,
-    speed:.018+Math.random()*.032,
-    drift:1.0+Math.random()*1.45,
-    size:.20+Math.random()*.54,
+  const SOLAR_WIND=Array.from({length:132},(_,i)=>({
+    a:(Math.random()-.5)*1.42,
+    lane:(i%17-8)/8,
+    side:i%3===0?1:-1,
+    speed:.016+Math.random()*.036,
+    drift:1.08+Math.random()*1.75,
+    size:.18+Math.random()*.62,
     phase:Math.random()*10,
-    op:.14+Math.random()*.24
+    op:.13+Math.random()*.27
   }));
 
   // ── Orbit / Planet definitions ────────────────────────────────────────────
@@ -572,22 +573,23 @@ window.addEventListener('scroll',()=>{
     for(const p of SOLAR_WIND){
       const t=(now*p.speed+p.phase)%1;
       const ease=t*t*(3-2*t);
-      const direction=-1; // leftward/backward drift in the hero composition
-      const sourceX=CX - SR*.08 + Math.cos(p.a)*SR*.18;
-      const sourceY=CY + p.lane*SR*.82 + Math.sin(now*.14+p.phase)*SR*.10;
-      const x=sourceX + direction*(SR*.26 + ease*SR*6.2);
-      const y=sourceY + Math.sin(p.a+ease*2.0)*SR*.25;
-      const alpha=p.op*Math.pow(1-ease,.9)*(.86+.14*Math.sin(now*.7+p.phase));
-      const tail=SR*(.55+ease*1.35)*p.drift;
-      const g=ctx.createLinearGradient(x+tail,y,x,y);
+      const direction=p.side;
+      const sourceX=CX + direction*SR*.58 + Math.cos(p.a)*SR*.10;
+      const sourceY=CY + p.lane*SR*.78 + Math.sin(now*.18+p.phase)*SR*.11;
+      const curve=Math.sin(p.a+ease*2.5+now*.10)*SR*.32;
+      const x=sourceX + direction*(SR*.18 + ease*SR*4.9);
+      const y=sourceY + curve + direction*Math.sin(ease*Math.PI)*SR*.18;
+      const alpha=p.op*Math.pow(1-ease,.82)*(.82+.18*Math.sin(now*.9+p.phase));
+      const tail=SR*(.55+ease*1.55)*p.drift;
+      const g=ctx.createLinearGradient(x-direction*tail,y-curve*.18,x,y);
       g.addColorStop(0,'rgba(0,184,217,0)');
-      g.addColorStop(.54,`rgba(62,220,235,${alpha*.42})`);
-      g.addColorStop(1,`rgba(225,255,255,${alpha*.78})`);
+      g.addColorStop(.46,`rgba(62,220,235,${alpha*.36})`);
+      g.addColorStop(1,`rgba(225,255,255,${alpha*.72})`);
       ctx.strokeStyle=g;
       ctx.lineWidth=p.size;
       ctx.lineCap='round';
       ctx.beginPath();
-      ctx.moveTo(x+tail,y);
+      ctx.moveTo(x-direction*tail,y-curve*.18);
       ctx.lineTo(x,y);
       ctx.stroke();
       if(p.size>.75){
@@ -596,6 +598,39 @@ window.addEventListener('scroll',()=>{
         ctx.fillStyle=`rgba(210,255,255,${alpha*.56})`;
         ctx.fill();
       }
+    }
+    ctx.restore();
+  }
+
+  function drawCorona(CX,CY,SR,now){
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    // Soft solar halo that breathes around the U instead of a hard edge.
+    const corona=ctx.createRadialGradient(CX,CY,SR*.72,CX,CY,SR*3.35);
+    corona.addColorStop(0,'rgba(185,255,255,.10)');
+    corona.addColorStop(.26,'rgba(70,240,246,.16)');
+    corona.addColorStop(.58,'rgba(0,184,217,.08)');
+    corona.addColorStop(1,'rgba(0,184,217,0)');
+    ctx.beginPath();ctx.arc(CX,CY,SR*3.35,0,Math.PI*2);ctx.fillStyle=corona;ctx.fill();
+    // Curving magnetic-field wisps.
+    for(let i=0;i<18;i++){
+      const a=(i/18)*Math.PI*2+now*.035*(i%2?1:-1);
+      const side=Math.cos(a)>=0?1:-1;
+      const sx=CX+Math.cos(a)*SR*.86;
+      const sy=CY+Math.sin(a)*SR*.62;
+      const ex=CX+side*SR*(2.25+.32*Math.sin(now*.3+i));
+      const ey=sy+Math.sin(a*2+now*.2)*SR*.52;
+      const c1x=CX+side*SR*(1.05+.15*Math.sin(i));
+      const c1y=CY+Math.sin(a)*SR*(1.05+.2*Math.cos(now+i));
+      const c2x=CX+side*SR*1.72;
+      const c2y=ey-Math.cos(a)*SR*.35;
+      const alpha=.055+.035*Math.sin(now*.65+i);
+      ctx.strokeStyle=`rgba(130,245,255,${Math.max(.025,alpha)})`;
+      ctx.lineWidth=.55+(i%3)*.18;
+      ctx.beginPath();
+      ctx.moveTo(sx,sy);
+      ctx.bezierCurveTo(c1x,c1y,c2x,c2y,ex,ey);
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -627,8 +662,24 @@ window.addEventListener('scroll',()=>{
     ctx.beginPath();ctx.arc(CX,CY,SR*2.45,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
     ctx.globalCompositeOperation='source-over';
 
-    ctx.shadowColor='rgba(100,255,255,1)';
-    ctx.shadowBlur=SR*1.08;
+    // A blurred under-stroke makes the edge fuzzy while the main stroke stays simple.
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+    ctx.shadowColor='rgba(80,250,255,1)';
+    ctx.shadowBlur=SR*1.28;
+    ctx.strokeStyle='rgba(90,245,250,.24)';
+    ctx.lineWidth=8.8*scale;
+    ctx.beginPath();
+    ctx.moveTo(X(15.0),Y(10));
+    ctx.lineTo(X(15.0),Y(36.8));
+    ctx.quadraticCurveTo(X(15.0),Y(51.8),X(26),Y(51.8));
+    ctx.quadraticCurveTo(X(37.0),Y(51.8),X(37.0),Y(36.8));
+    ctx.lineTo(X(37.0),Y(10));
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.shadowColor='rgba(100,255,255,.92)';
+    ctx.shadowBlur=SR*1.0;
     ctx.strokeStyle=grad;
     ctx.lineWidth=5.0*scale;
 
@@ -643,9 +694,9 @@ window.addEventListener('scroll',()=>{
 
     // Strong fuzzy bloom around the simple silhouette.
     const core=ctx.createRadialGradient(CX,CY,SR*.1,CX,CY,SR*1.22);
-    core.addColorStop(0,'rgba(235,255,255,.22)');
-    core.addColorStop(.36,'rgba(55,245,245,.17)');
-    core.addColorStop(.72,'rgba(0,184,217,.11)');
+    core.addColorStop(0,'rgba(235,255,255,.26)');
+    core.addColorStop(.36,'rgba(55,245,245,.20)');
+    core.addColorStop(.72,'rgba(0,184,217,.13)');
     core.addColorStop(1,'rgba(0,184,217,0)');
     ctx.globalCompositeOperation='screen';
     ctx.beginPath();ctx.arc(CX,CY,SR*1.55,0,Math.PI*2);ctx.fillStyle=core;ctx.fill();
@@ -696,6 +747,7 @@ window.addEventListener('scroll',()=>{
         rg.addColorStop(0,`rgba(0,184,217,${0.07/i})`);rg.addColorStop(1,'rgba(0,0,0,0)');
         ctx.beginPath();ctx.arc(CX,CY,SR*i*2,0,Math.PI*2);ctx.fillStyle=rg;ctx.fill();
       }
+      drawCorona(CX,CY,SR,now);
       drawEffervescence(CX,CY,SR,now);
       drawSolarWind(CX,CY,SR,now);
       // Ring around center
