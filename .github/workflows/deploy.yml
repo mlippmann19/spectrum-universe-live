@@ -1,19 +1,38 @@
-name: Deploy to Cloudflare Pages
+name: Deploy
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  deploy-cloudflare:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: Deploy to Cloudflare Pages
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy universecrm-landing to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name=universecrm-landing --branch=main
+
+  deploy-supabase-functions:
+    runs-on: ubuntu-latest
+    name: Deploy Supabase Edge Functions
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy website-lead function
+        run: |
+          supabase functions deploy website-lead \
+            --project-ref tplkmtmuoyslmjewcudk \
+            --no-verify-jwt
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

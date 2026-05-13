@@ -22,6 +22,17 @@ const PDF_MAP: Record<string, string> = {
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_FlexPackagingDoc_Final_March26comp-2.pdf",
   "Spectrum Advanced PFAS Statement":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PFASStatement_Finalcomp_March26.pdf",
+  // Aegis PDFs
+  "AEGIS Corrosion-Resistant Coatings":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Aegis_CorrosionDoc_Final_Feb26comp-7.pdf",
+  "Aegis Corrosion-Resistant Coatings":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Aegis_CorrosionDoc_Final_Feb26comp-7.pdf",
+  "AEGIS Full Offering":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_Aegis_FullOfferingLeaveBehind_FinalComp_March26-6.pdf",
+  "Radiant Cleaning Services":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SA_RadiantCleaning_ServiceOfferingDoc_Final_Feb26comp-8.pdf",
+  "Paper Mill Reference":
+    "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_PaperMillDoc_Final_Feb26comp-2.pdf",
   // Alias variants
   "Fluoron Capability Statement":
     "https://newsite.fluoron.com/wp-content/uploads/sites/2/2026/05/SpectrumAdvanced_CapabilityDoc_Final_Feb26-1-comp.pdf",
