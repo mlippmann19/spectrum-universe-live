@@ -40,9 +40,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;ali
 .star{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(210,242,255,.72);box-shadow:0 0 8px rgba(110,231,249,.45);animation:twinkle var(--dur,6s) ease-in-out infinite;animation-delay:var(--delay,0s)}
 .star.small{width:1px;height:1px;opacity:.65}
 .star.large{width:2.5px;height:2.5px;box-shadow:0 0 11px rgba(110,231,249,.55)}
-.hero-comet{position:absolute;left:-24vw;top:17vh;width:220px;height:1px;background:linear-gradient(90deg,transparent,rgba(110,231,249,.42),rgba(255,255,255,.95));filter:drop-shadow(0 0 7px rgba(110,231,249,.62));transform:rotate(13deg);opacity:0;animation:heroComet 19s cubic-bezier(.22,.61,.36,1) infinite;animation-delay:2s}
+.hero-comet{position:absolute;left:-34vw;top:15vh;width:36vw;height:30px;opacity:0;transform:rotate(12deg);filter:blur(.2px);animation:heroComet 24s cubic-bezier(.19,.64,.31,1) infinite;animation-delay:3s}
+.hero-comet::before{content:'';position:absolute;right:0;top:12px;width:7px;height:7px;border-radius:50%;background:rgba(245,255,255,.92);box-shadow:0 0 10px rgba(180,245,255,.78),0 0 28px rgba(80,210,240,.34)}
+.hero-comet::after{content:'';position:absolute;right:3px;top:13px;width:100%;height:5px;background:linear-gradient(90deg,transparent 0%,rgba(80,200,230,.03) 24%,rgba(120,230,250,.14) 60%,rgba(230,255,255,.62) 100%);clip-path:polygon(0 46%,74% 24%,100% 50%,74% 76%,0 54%);filter:blur(1.1px)}
 @keyframes twinkle{0%,100%{opacity:.12;transform:scale(.72)}45%{opacity:.82;transform:scale(1.05)}70%{opacity:.32;transform:scale(.9)}}
-@keyframes heroComet{0%,52%{opacity:0;transform:translate3d(0,0,0) rotate(13deg)}58%{opacity:.82}72%{opacity:.68}86%,100%{opacity:0;transform:translate3d(150vw,24vh,0) rotate(13deg)}}
+@keyframes heroComet{0%,58%{opacity:0;transform:translate3d(0,0,0) rotate(12deg)}62%{opacity:.55}72%{opacity:.38}84%,100%{opacity:0;transform:translate3d(150vw,23vh,0) rotate(12deg)}}
 
 .eyebrow{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.24em;text-transform:uppercase;color:var(--cyan-soft);display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:5px}
 .eyebrow::before,.eyebrow::after{content:'';display:block;width:28px;height:1px;background:var(--cyan);opacity:0.5}
@@ -456,6 +458,40 @@ window.addEventListener('scroll',()=>{
     phase:Math.random()*10,
     op:.13+Math.random()*.27
   }));
+  const U_PARTICLES=(()=>{
+    const pts=[];
+    const add=(x,y,density=1)=>{
+      const bottomWeight=Math.max(0,Math.min(1,(y-18)/34));
+      const count=Math.round((1.2+density*3.45)*(0.38+bottomWeight*1.02));
+      for(let n=0;n<count;n++){
+        pts.push({
+          x:x+(Math.random()-.5)*3.4,
+          y:y+(Math.random()-.5)*3.4,
+          base:bottomWeight,
+          size:.18+Math.random()*(.36+bottomWeight*.48),
+          phase:Math.random()*Math.PI*2,
+          drift:.55+Math.random()*1.55,
+          alpha:.14+bottomWeight*.34+Math.random()*.16
+        });
+      }
+    };
+    // Sparse rising legs: density deliberately evaporates toward the top.
+    for(let i=0;i<=58;i++){
+      const t=i/54;
+      const y=10+t*28;
+      const density=.18+t*.88;
+      if(Math.random()<.46+t*.48) add(15.0,y,density);
+      if(Math.random()<.46+t*.48) add(37.0,y,density);
+    }
+    // Dense lower curve, where the U visually anchors.
+    for(let i=0;i<=116;i++){
+      const a=Math.PI*(i/116);
+      const x=26+11*Math.cos(a);
+      const y=37.4+14.3*Math.sin(a);
+      add(x,y,1.45);
+    }
+    return pts;
+  })();
 
   // ── Orbit / Planet definitions ────────────────────────────────────────────
   // All orbits go same direction (positive angle increment).
@@ -635,72 +671,43 @@ window.addEventListener('scroll',()=>{
     ctx.restore();
   }
 
-  function drawCapacitorMark(CX,CY,SR){
-    const scale=SR/33;
+  function drawCapacitorMark(CX,CY,SR,now){
+    const scale=SR/34;
     const ox=CX-26*scale, oy=CY-29*scale;
-    function X(v){return ox+v*scale}
-    function Y(v){return oy+v*scale}
     ctx.save();
-    ctx.lineJoin='round';
-    ctx.lineCap='round';
-
-    // Simple Plasma Capacitor: keynote-clean monoline, top fades to air, base falls darker.
-    const grad=ctx.createLinearGradient(CX,Y(7),CX,Y(53));
-    grad.addColorStop(0,'rgba(210,255,255,0)');
-    grad.addColorStop(.20,'rgba(190,255,255,.18)');
-    grad.addColorStop(.50,'rgba(98,248,248,.80)');
-    grad.addColorStop(.78,'rgba(24,205,218,.94)');
-    grad.addColorStop(1,'rgba(3,76,105,.96)');
-
-    // Outer ionized field.
     ctx.globalCompositeOperation='screen';
-    let halo=ctx.createRadialGradient(CX,CY,SR*.12,CX,CY,SR*2.45);
-    halo.addColorStop(0,'rgba(210,255,255,.30)');
-    halo.addColorStop(.34,'rgba(0,235,242,.20)');
-    halo.addColorStop(.62,'rgba(0,184,217,.09)');
+
+    // Particle-only U: dense, brighter bottom; sparse, evaporating top.
+    const halo=ctx.createRadialGradient(CX,CY+SR*.18,SR*.18,CX,CY,SR*2.6);
+    halo.addColorStop(0,'rgba(210,255,255,.18)');
+    halo.addColorStop(.34,'rgba(62,242,242,.16)');
+    halo.addColorStop(.72,'rgba(0,184,217,.08)');
     halo.addColorStop(1,'rgba(0,184,217,0)');
-    ctx.beginPath();ctx.arc(CX,CY,SR*2.45,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
-    ctx.globalCompositeOperation='source-over';
+    ctx.beginPath();ctx.arc(CX,CY,SR*2.6,0,Math.PI*2);ctx.fillStyle=halo;ctx.fill();
 
-    // A blurred under-stroke makes the edge fuzzy while the main stroke stays simple.
-    ctx.save();
-    ctx.globalCompositeOperation='screen';
-    ctx.shadowColor='rgba(80,250,255,1)';
-    ctx.shadowBlur=SR*1.28;
-    ctx.strokeStyle='rgba(90,245,250,.24)';
-    ctx.lineWidth=8.8*scale;
-    ctx.beginPath();
-    ctx.moveTo(X(15.0),Y(10));
-    ctx.lineTo(X(15.0),Y(36.8));
-    ctx.quadraticCurveTo(X(15.0),Y(51.8),X(26),Y(51.8));
-    ctx.quadraticCurveTo(X(37.0),Y(51.8),X(37.0),Y(36.8));
-    ctx.lineTo(X(37.0),Y(10));
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.shadowColor='rgba(100,255,255,.92)';
-    ctx.shadowBlur=SR*1.0;
-    ctx.strokeStyle=grad;
-    ctx.lineWidth=5.0*scale;
-
-    // One path only: thin, same weight through legs and base.
-    ctx.beginPath();
-    ctx.moveTo(X(15.0),Y(10));
-    ctx.lineTo(X(15.0),Y(36.8));
-    ctx.quadraticCurveTo(X(15.0),Y(51.8),X(26),Y(51.8));
-    ctx.quadraticCurveTo(X(37.0),Y(51.8),X(37.0),Y(36.8));
-    ctx.lineTo(X(37.0),Y(10));
-    ctx.stroke();
-
-    // Strong fuzzy bloom around the simple silhouette.
-    const core=ctx.createRadialGradient(CX,CY,SR*.1,CX,CY,SR*1.22);
-    core.addColorStop(0,'rgba(235,255,255,.26)');
-    core.addColorStop(.36,'rgba(55,245,245,.20)');
-    core.addColorStop(.72,'rgba(0,184,217,.13)');
-    core.addColorStop(1,'rgba(0,184,217,0)');
-    ctx.globalCompositeOperation='screen';
-    ctx.beginPath();ctx.arc(CX,CY,SR*1.55,0,Math.PI*2);ctx.fillStyle=core;ctx.fill();
-    ctx.globalCompositeOperation='source-over';
+    for(const p of U_PARTICLES){
+      const topFade=Math.max(0,Math.min(1,(p.y-8)/42));
+      const shimmer=.72+.28*Math.sin(now*(1.15+p.drift*.2)+p.phase);
+      const breathe=Math.sin(now*.85+p.phase)*p.drift;
+      const px=ox+(p.x + Math.cos(now*.55+p.phase)*.42 + breathe*.16)*scale;
+      const py=oy+(p.y + Math.sin(now*.7+p.phase)*.50)*scale;
+      const sz=p.size*scale*(.72+.28*shimmer);
+      const alpha=p.alpha*(.36+topFade*.82)*shimmer;
+      const g=ctx.createRadialGradient(px,py,0,px,py,sz*1.75);
+      g.addColorStop(0,`rgba(238,255,255,${Math.min(.72,alpha+.10)})`);
+      g.addColorStop(.42,`rgba(105,252,252,${alpha*.50})`);
+      g.addColorStop(1,'rgba(0,184,217,0)');
+      ctx.beginPath();
+      ctx.arc(px,py,sz*1.75,0,Math.PI*2);
+      ctx.fillStyle=g;
+      ctx.fill();
+      if(p.base>.55){
+        ctx.beginPath();
+        ctx.arc(px,py,Math.max(.22,sz*.42),0,Math.PI*2);
+        ctx.fillStyle=`rgba(245,255,255,${alpha*.48})`;
+        ctx.fill();
+      }
+    }
     ctx.restore();
   }
 
@@ -776,7 +783,7 @@ window.addEventListener('scroll',()=>{
       ctx.beginPath();ctx.arc(CX,CY,SR,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
 
       // Central "U"
-      drawCapacitorMark(CX,CY,SR);
+      drawCapacitorMark(CX,CY,SR,now);
     }
 
     function drawPlanetPass(pl, allowLabel){
