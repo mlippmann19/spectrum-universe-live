@@ -463,6 +463,22 @@ window.addEventListener('scroll',()=>{
         });
       }
     }
+    // Medium-density middle bridge so the U does not feel hollow in the upper center.
+    for(const x of [15.0,37.0]){
+      for(let i=0;i<42;i++){
+        const t=Math.random();
+        pts.push({
+          x:x+(Math.random()-.5)*5.2,
+          y:7.0+t*26.0+(Math.random()-.5)*2.6,
+          base:.22+t*.34,
+          size:.16+Math.random()*.34,
+          phase:Math.random()*Math.PI*2,
+          drift:.9+Math.random()*2.1,
+          alpha:.20+Math.random()*.26,
+          mid:true
+        });
+      }
+    }
     // Dense lower curve, where the U visually anchors.
     for(let i=0;i<=116;i++){
       const a=Math.PI*(i/116);
@@ -714,8 +730,8 @@ window.addEventListener('scroll',()=>{
     for(const orb of ORBITS) drawRing(orb.r*S,orb.tx,orb.ty+gRot*57.3,0.15);
 
     // Center — glowing planet "U"
-    const pulse=1+0.012*Math.sin(now*0.42);
-    const SR=S*0.132*pulse;
+    const pulse=1+0.016*Math.sin(now*0.42);
+    const SR=S*0.166*pulse;
 
     // ── Collect all planets → sort by z ─────────────────────────────────────
     const all=[];
@@ -846,11 +862,9 @@ window.addEventListener('scroll',()=>{
       ctx.font=`600 ${l.fs}px 'Rajdhani',sans-serif`;
       ctx.textAlign=l.align;ctx.textBaseline='middle';
       const txOff=l.align==='left'?5:l.align==='right'?-5:0;
-      ctx.fillStyle='rgba(3,7,17,0.20)';
-      ctx.fillRect(box.left,box.top,box.width,box.height);
-      ctx.shadowColor='rgba(0,0,0,0.9)';
-      ctx.shadowBlur=5;
-      ctx.fillStyle=`rgba(220,233,246,${l.alpha})`;
+      ctx.shadowColor='rgba(0,0,0,0.95)';
+      ctx.shadowBlur=6;
+      ctx.fillStyle=`rgba(255,255,255,${Math.min(.96,l.alpha+.20)})`;
       ctx.fillText(l.label,x+txOff,y);
       ctx.restore();
     }
