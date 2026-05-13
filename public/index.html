@@ -36,6 +36,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;ali
 }
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 72% 68% at 50% calc(48% + var(--hero-drift)),rgba(0,184,217,0.07) 0%,rgba(0,80,110,0.035) 40%,transparent 72%);pointer-events:none}
 .hero::after{content:'';position:absolute;left:50%;bottom:0;width:min(920px,80vw);height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(110,231,249,0.18),transparent)}
+.starfield{position:absolute;inset:0;z-index:1;overflow:hidden;pointer-events:none;opacity:.78}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(210,242,255,.72);box-shadow:0 0 8px rgba(110,231,249,.45);animation:twinkle var(--dur,6s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+.star.small{width:1px;height:1px;opacity:.65}
+.star.large{width:2.5px;height:2.5px;box-shadow:0 0 11px rgba(110,231,249,.55)}
+.hero-comet{position:absolute;left:-18vw;top:15vh;width:130px;height:1px;background:linear-gradient(90deg,transparent,rgba(110,231,249,.34),rgba(255,255,255,.82));filter:drop-shadow(0 0 5px rgba(110,231,249,.45));transform:rotate(17deg);opacity:0;animation:heroComet 38s cubic-bezier(.22,.61,.36,1) infinite;animation-delay:11s}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(.72)}45%{opacity:.82;transform:scale(1.05)}70%{opacity:.32;transform:scale(.9)}}
+@keyframes heroComet{0%,74%{opacity:0;transform:translate3d(0,0,0) rotate(17deg)}78%{opacity:.72}86%{opacity:.38}92%,100%{opacity:0;transform:translate3d(145vw,28vh,0) rotate(17deg)}}
 
 .eyebrow{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.24em;text-transform:uppercase;color:var(--cyan-soft);display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:5px}
 .eyebrow::before,.eyebrow::after{content:'';display:block;width:28px;height:1px;background:var(--cyan);opacity:0.5}
@@ -163,6 +170,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
 </nav>
 
 <section class="hero">
+  <div class="starfield" aria-hidden="true"></div>
   <div class="eyebrow">B2B Manufacturing Intelligence</div>
   <h1>Your Industry,<em>Your Universe.</em></h1>
   <canvas id="orrery-canvas"></canvas>
@@ -247,6 +255,25 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementB
 
 // ── Subtle scroll polish ─────────────────────────────────────────────────────
 const revealEls=[...document.querySelectorAll('.reveal')];
+const starfield=document.querySelector('.starfield');
+if(starfield){
+  const frag=document.createDocumentFragment();
+  for(let i=0;i<115;i++){
+    const s=document.createElement('span');
+    const y=Math.random()*74;
+    const x=Math.random()*100;
+    s.className='star '+(i%13===0?'large':i%3===0?'small':'');
+    s.style.left=x+'%';
+    s.style.top=y+'%';
+    s.style.setProperty('--dur',(4.8+Math.random()*7.5)+'s');
+    s.style.setProperty('--delay',(-Math.random()*9)+'s');
+    frag.appendChild(s);
+  }
+  const comet=document.createElement('span');
+  comet.className='hero-comet';
+  frag.appendChild(comet);
+  starfield.appendChild(frag);
+}
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',event=>{
     const target=document.querySelector(a.getAttribute('href'));
