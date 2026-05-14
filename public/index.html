@@ -61,20 +61,20 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan) 50%,transparent);opacity:.1}
 
 /* PIPELINE */
-.pipeline-wrap{padding:76px 56px 86px}
-.pipeline-kicker{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.20em;text-transform:uppercase;color:var(--muted);margin-bottom:40px;display:flex;align-items:center;gap:14px}
+.pipeline-wrap{padding:96px 56px 92px;max-width:1280px;margin:0 auto}
+.pipeline-kicker{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:rgba(220,245,255,0.72);margin-bottom:34px;display:flex;align-items:center;gap:18px}
 .pipeline-kicker::before,.pipeline-kicker::after{content:'';display:block;height:1px;flex:1;background:var(--border)}
-.chain{display:flex;align-items:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:0;padding-bottom:12px;-ms-overflow-style:none;scrollbar-width:none}
+.chain{display:flex;align-items:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:0;padding:30px 28px 28px;border:1px solid rgba(110,231,249,0.13);background:linear-gradient(180deg,rgba(7,16,28,0.72),rgba(3,7,17,0.34));box-shadow:0 28px 90px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.03);-ms-overflow-style:none;scrollbar-width:none}
 .chain::-webkit-scrollbar{display:none}
-.cnode{display:flex;flex-direction:column;align-items:center;gap:9px;flex-shrink:0}
-.cdot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 9px var(--cyan),0 0 20px var(--cglow)}
+.cnode{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;min-width:96px}
+.cdot{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e9ffff 0%,#33e5ff 34%,#007c9a 74%,#013244 100%);box-shadow:0 0 16px rgba(0,184,217,0.95),0 0 42px rgba(0,184,217,0.28)}
 .cnode:hover .cdot{box-shadow:0 0 14px var(--cyan),0 0 36px var(--cglow)}
-.ctxt{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(220,233,246,0.42);white-space:nowrap;transition:color .2s}
+.ctxt{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:rgba(235,245,255,0.76);white-space:nowrap;transition:color .2s}
 .cnode:hover .ctxt{color:var(--cyan)}
-.carr{width:40px;height:1px;background:linear-gradient(90deg,rgba(0,184,217,0.5),rgba(0,184,217,0.1));flex-shrink:0;margin-top:3.5px;position:relative}
-.carr::after{content:'';position:absolute;right:-1px;top:-3px;border:3px solid transparent;border-left:5px solid rgba(0,184,217,0.4)}
-.chain-caption{margin-top:32px;font-size:16px;color:var(--muted);max-width:700px;line-height:1.75;letter-spacing:0.01em}
-.chain-caption strong{color:rgba(220,233,246,0.6);font-weight:500}
+.carr{width:42px;height:1px;background:linear-gradient(90deg,rgba(0,184,217,0.72),rgba(0,184,217,0.12));flex-shrink:0;margin-top:6.5px;position:relative}
+.carr::after{content:'';position:absolute;right:-1px;top:-4px;border:4px solid transparent;border-left:7px solid rgba(0,184,217,0.55)}
+.chain-caption{margin:34px auto 0;font-size:19px;color:rgba(205,218,232,0.90);max-width:940px;line-height:1.7;letter-spacing:0.005em;text-align:center}
+.chain-caption strong{color:rgba(235,245,255,0.88);font-weight:500}
 
 /* MODULES */
 .modules-wrap{padding:0 56px 104px;border-top:1px solid var(--border)}
@@ -146,6 +146,11 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   .btn-p{width:100%;max-width:240px;text-align:center;padding:12px 18px}
   .mgrid{grid-template-columns:1fr}
   .cta-inner{padding:42px 24px}
+  .pipeline-wrap{padding-top:72px}
+  .chain{padding:24px 18px}
+  .cnode{min-width:90px}
+  .ctxt{font-size:13px;letter-spacing:.11em}
+  .chain-caption{font-size:17px;text-align:left}
 }
 </style>
 </head>
@@ -162,7 +167,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
     Universe<span>CRM</span>
   </a>
   <div class="nr">
-    <a href="mailto:mlippmann@spectrumadvanced.com" class="nlink">Contact</a>
+    <a href="mailto:info@spectrumdadvanced.com" class="nlink">Contact</a>
     <a href="access.html" class="nbtn">Early Access</a>
   </div>
 </nav>
@@ -207,7 +212,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
 
 <footer>
   <span class="fb">Universe<span>CRM</span> · universecrm.io</span>
-  <span class="fr">mlippmann@spectrumadvanced.com</span>
+  <span class="fr">info@spectrumdadvanced.com</span>
 </footer>
 
 <div class="ov" id="ov" onclick="if(event.target===this)this.classList.remove('open')">

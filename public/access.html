@@ -186,7 +186,7 @@ body.access-page footer{padding-bottom:32px}
     Universe<span>CRM</span>
   </a>
   <div class="nr">
-    <a href="mailto:mlippmann@spectrumadvanced.com" class="nlink">Contact</a>
+    <a href="mailto:info@spectrumdadvanced.com" class="nlink">Contact</a>
     <a href="access.html" class="nbtn">Early Access</a>
   </div>
 </nav>
@@ -237,7 +237,7 @@ body.access-page footer{padding-bottom:32px}
 
 <footer>
   <span class="fb">Universe<span>CRM</span> · universecrm.io</span>
-  <span class="fr">mlippmann@spectrumadvanced.com</span>
+  <span class="fr">info@spectrumdadvanced.com</span>
 </footer>
 
 <div class="ov" id="ov" onclick="if(event.target===this)this.classList.remove('open')">
@@ -280,7 +280,7 @@ function handleSub(e){
   const company=document.getElementById('fc').value.trim();
   const subject=encodeURIComponent(`Universe CRM Early Access — ${company || name || 'New Request'}`);
   const body=encodeURIComponent(`Hi Matt,\n\nI'd like early access to Universe CRM.\n\nName: ${name}\nWork email: ${email}\nCompany: ${company}\n\nPlease reach out when you have a moment.\n`);
-  window.location.href=`mailto:mlippmann@spectrumadvanced.com?subject=${subject}&body=${body}`;
+  window.location.href=`mailto:info@spectrumdadvanced.com?subject=${subject}&body=${body}`;
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('ov').classList.remove('open');});
 
