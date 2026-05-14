@@ -176,6 +176,40 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   <div class="hcta"><a href="access.html" class="btn-p">Request Early Access</a></div>
 </section>
 
+<div class="divider"></div>
+
+<section class="pipeline-wrap reveal">
+  <div class="pipeline-kicker">The Complete Revenue Chain</div>
+  <div class="chain" id="chain"></div>
+  <p class="chain-caption">Every other platform handles <strong>fragments</strong> of this chain. Universe is the first system to close the loop — <strong>prospect intelligence through cash collection</strong>, purpose-built for industrial B2B.</p>
+</section>
+
+<section class="modules-wrap reveal">
+  <div class="modules-head">
+    <h2>Every Module.<br/>One Universe.</h2>
+    <p>Each layer of your operation built natively — not bolted on.</p>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+</section>
+
+<section class="cta-wrap reveal">
+  <div class="cta-inner">
+    <div class="cta-left">
+      <h2>Join the First Wave.</h2>
+      <p>We're onboarding a select cohort of B2B manufacturers in 2026. Every deployment is configured to your exact business — not a generic template.</p>
+    </div>
+    <div class="cta-right">
+      <a href="access.html" class="btn-p">Request Early Access →</a>
+      <p class="anote" style="margin-top:12px">Opens a direct request page.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="fb">Universe<span>CRM</span> · universecrm.io</span>
+  <span class="fr">mlippmann@spectrumadvanced.com</span>
+</footer>
+
 <div class="ov" id="ov" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="ob">
     <h3>You're In.</h3>
@@ -506,21 +540,21 @@ window.addEventListener('scroll',()=>{
   const ORBITS=[
     { r:0.145, spd:0.095, tx:65, ty:15,     // inner — deliberate, still slightly faster
       planets:[
-        {lbl:'PROSPECTS', a:0.35,    sz:13.4, col:'#18b7d6', trail:[], moons:[{a:1.8,spd:0.055,or:20,sz:2.1,col:'#70dff0'}]},
-        {lbl:'CRM',       a:3.35,    sz:12.4, col:'#5d9edb', trail:[], ring:true, moons:[]},
-        {lbl:'WEBSITE',   a:5.05,    sz:11.8, col:'#7de3ff', trail:[], moons:[{a:0.6,spd:0.05,or:17,sz:1.8,col:'#d9fbff'}]},
+        {lbl:'PROSPECTS', a:0.35,    sz:13.4, col:'#18b7d6', trail:[], moons:[{a:1.8,spd:0.055,or:20,sz:2.1,col:'#86e8f7'}]},
+        {lbl:'CRM',       a:3.35,    sz:12.4, col:'#3f9fd5', trail:[], ring:true, moons:[]},
+        {lbl:'WEBSITE',   a:5.05,    sz:11.8, col:'#7adfff', trail:[], moons:[{a:0.6,spd:0.05,or:17,sz:1.8,col:'#d9fbff'}]},
       ]
     },
     { r:0.238, spd:0.062, tx:77, ty:-25,    // middle — measured
       planets:[
-        {lbl:'SERVICE',   a:0.85,    sz:14.0, col:'#2fbf9a', trail:[], moons:[{a:2.2,spd:0.045,or:21,sz:2.0,col:'#8df2d2'}]},
-        {lbl:'ANALYTICS', a:2.85,    sz:13.0, col:'#8e79d9', trail:[], moons:[{a:1.1,spd:0.04,or:18,sz:1.8,col:'#d3c8ff'}]},
-        {lbl:'FINANCE',   a:5.35,    sz:12.6, col:'#f0c766', trail:[], ring:true, moons:[]},
+        {lbl:'SERVICE',   a:0.85,    sz:14.0, col:'#23aeca', trail:[], moons:[{a:2.2,spd:0.045,or:21,sz:2.0,col:'#a6f4ff'}]},
+        {lbl:'ANALYTICS', a:2.85,    sz:13.0, col:'#5fb6e8', trail:[], moons:[{a:1.1,spd:0.04,or:18,sz:1.8,col:'#ccefff'}]},
+        {lbl:'FINANCE',   a:5.35,    sz:12.6, col:'#8bd7f2', trail:[], ring:true, moons:[]},
       ]
     },
     { r:0.34,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
       planets:[
-        {lbl:'ERP',       a:0.35,  sz:17.0, col:'#e3752f', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:31,sz:3.0,col:'#a96638'},{a:2.1,spd:0.05,or:41,sz:2.2,col:'#7e5331'}]},
+        {lbl:'ERP',       a:0.35,  sz:17.0, col:'#2d91c8', trail:[], ring:true, moons:[{a:0.3,spd:0.07,or:31,sz:3.0,col:'#75cde8'},{a:2.1,spd:0.05,or:41,sz:2.2,col:'#5aa7c8'}]},
       ]
     },
   ];
