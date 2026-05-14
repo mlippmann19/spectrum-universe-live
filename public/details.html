@@ -163,7 +163,7 @@ body.details-page .reveal{opacity:1;transform:none}
 <body class="details-page">
 
 <nav>
-  <a href="#" class="nl">
+  <a href="index.html" class="nl">
     <svg viewBox="0 0 26 26" fill="none">
       <circle cx="13" cy="13" r="7.5" fill="url(#nlg)"/>
       <ellipse cx="13" cy="13" rx="12" ry="3.8" stroke="rgba(0,184,217,0.45)" stroke-width="0.9" transform="rotate(-22 13 13)"/>
@@ -173,7 +173,7 @@ body.details-page .reveal{opacity:1;transform:none}
     Universe<span>CRM</span>
   </a>
   <div class="nr">
-    <a href="mailto:hello@universecrm.io" class="nlink">Contact</a>
+    <a href="mailto:mlippmann@spectrumadvanced.com" class="nlink">Contact</a>
     <a href="access.html" class="nbtn">Early Access</a>
   </div>
 </nav>
@@ -215,7 +215,7 @@ body.details-page .reveal{opacity:1;transform:none}
         <input class="ainput" type="email" placeholder="Work email" id="fe" required/>
         <input class="ainput" type="text" placeholder="Company name" id="fc" required/>
         <button type="submit" class="btn-p">Request Access →</button>
-        <p class="anote">No calls. No automation. A real reply.</p>
+        <p class="anote">Opens a prefilled email directly to Matt.</p>
       </form>
     </div>
   </div>
@@ -223,7 +223,7 @@ body.details-page .reveal{opacity:1;transform:none}
 
 <footer>
   <span class="fb">Universe<span>CRM</span> · universecrm.io</span>
-  <span class="fr">hello@universecrm.io</span>
+  <span class="fr">mlippmann@spectrumadvanced.com</span>
 </footer>
 
 <div class="ov" id="ov" onclick="if(event.target===this)this.classList.remove('open')">
@@ -259,7 +259,15 @@ const mg=document.getElementById('mgrid');
 mods.forEach(m=>{mg.innerHTML+=`<div class="mcard"><div class="mn">${m.n}</div><div class="mname">${m.name}</div><div class="mdesc">${m.desc}</div></div>`;});
 
 // ── Form ──────────────────────────────────────────────────────────────────────
-function handleSub(e){e.preventDefault();document.getElementById('ov').classList.add('open');['fn','fe','fc'].forEach(id=>document.getElementById(id).value='');}
+function handleSub(e){
+  e.preventDefault();
+  const name=document.getElementById('fn').value.trim();
+  const email=document.getElementById('fe').value.trim();
+  const company=document.getElementById('fc').value.trim();
+  const subject=encodeURIComponent(`Universe CRM Early Access — ${company || name || 'New Request'}`);
+  const body=encodeURIComponent(`Hi Matt,\n\nI'd like early access to Universe CRM.\n\nName: ${name}\nWork email: ${email}\nCompany: ${company}\n\nPlease reach out when you have a moment.\n`);
+  window.location.href=`mailto:mlippmann@spectrumadvanced.com?subject=${subject}&body=${body}`;
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('ov').classList.remove('open');});
 
 // ── Subtle scroll polish ─────────────────────────────────────────────────────
