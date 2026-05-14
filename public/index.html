@@ -186,7 +186,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
 
 <script>
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-const steps=['Prospect','Contact','MQL','TQL','Quote','Purchase Order','Production','Shipment','Invoice','Collect'];
+const steps=['Prospect','MQL','Quote','PO','Work Order','Shipment','Invoice','Collections'];
 const cc=document.getElementById('chain');
 if(cc){
   steps.forEach((s,i)=>{
@@ -506,16 +506,16 @@ window.addEventListener('scroll',()=>{
   const ORBITS=[
     { r:0.145, spd:0.095, tx:65, ty:15,     // inner — deliberate, still slightly faster
       planets:[
-        {lbl:'PROSPECTS', a:0.35,    sz:12.8, col:'#18b7d6', trail:[], moons:[]},
-        {lbl:'CRM',       a:3.35,    sz:11.6, col:'#5d9edb', trail:[], moons:[]},
-        {lbl:'WEBSITE',   a:5.05,    sz:10.8, col:'#7de3ff', trail:[], moons:[]},
+        {lbl:'PROSPECTS', a:0.35,    sz:13.4, col:'#18b7d6', trail:[], moons:[{a:1.8,spd:0.055,or:20,sz:2.1,col:'#70dff0'}]},
+        {lbl:'CRM',       a:3.35,    sz:12.4, col:'#5d9edb', trail:[], ring:true, moons:[]},
+        {lbl:'WEBSITE',   a:5.05,    sz:11.8, col:'#7de3ff', trail:[], moons:[{a:0.6,spd:0.05,or:17,sz:1.8,col:'#d9fbff'}]},
       ]
     },
     { r:0.238, spd:0.062, tx:77, ty:-25,    // middle — measured
       planets:[
-        {lbl:'SERVICE',   a:0.85,    sz:13.6, col:'#2fbf9a', trail:[], moons:[]},
-        {lbl:'ANALYTICS', a:2.85,    sz:12.2, col:'#8e79d9', trail:[], moons:[]},
-        {lbl:'FINANCE',   a:5.35,    sz:11.8, col:'#f0c766', trail:[], moons:[]},
+        {lbl:'SERVICE',   a:0.85,    sz:14.0, col:'#2fbf9a', trail:[], moons:[{a:2.2,spd:0.045,or:21,sz:2.0,col:'#8df2d2'}]},
+        {lbl:'ANALYTICS', a:2.85,    sz:13.0, col:'#8e79d9', trail:[], moons:[{a:1.1,spd:0.04,or:18,sz:1.8,col:'#d3c8ff'}]},
+        {lbl:'FINANCE',   a:5.35,    sz:12.6, col:'#f0c766', trail:[], ring:true, moons:[]},
       ]
     },
     { r:0.34,  spd:0.032, tx:52, ty:50,     // outer — slow, inevitable
@@ -825,7 +825,7 @@ window.addEventListener('scroll',()=>{
           const my=pl.py + m.or*pl.sc*Math.sin(m.a)*0.48;
           // Moon orbit ring
           ctx.save();
-          ctx.strokeStyle=`rgba(255,255,255,0.045)`;ctx.lineWidth=0.4;
+          ctx.strokeStyle=`rgba(210,245,255,0.035)`;ctx.lineWidth=0.35;
           ctx.beginPath();ctx.ellipse(pl.px,pl.py,m.or*pl.sc,m.or*pl.sc*0.48,0,0,Math.PI*2);ctx.stroke();
           ctx.restore();
           sphere(mx, my, m.sz*pl.sc, m.col);

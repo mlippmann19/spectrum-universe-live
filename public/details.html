@@ -70,12 +70,12 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 .pipeline-kicker::before,.pipeline-kicker::after{content:'';display:block;height:1px;flex:1;background:var(--border)}
 .chain{display:flex;align-items:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:0;padding:30px 28px 28px;border:1px solid rgba(110,231,249,0.13);background:linear-gradient(180deg,rgba(7,16,28,0.72),rgba(3,7,17,0.34));box-shadow:0 28px 90px rgba(0,0,0,0.28),inset 0 1px 0 rgba(255,255,255,0.03);-ms-overflow-style:none;scrollbar-width:none}
 .chain::-webkit-scrollbar{display:none}
-.cnode{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;min-width:102px}
+.cnode{display:flex;flex-direction:column;align-items:center;gap:14px;flex-shrink:0;min-width:96px}
 .cdot{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e9ffff 0%,#33e5ff 34%,#007c9a 74%,#013244 100%);box-shadow:0 0 16px rgba(0,184,217,0.95),0 0 42px rgba(0,184,217,0.28)}
 .cnode:hover .cdot{box-shadow:0 0 20px var(--cyan),0 0 52px var(--cglow)}
 .ctxt{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:rgba(235,245,255,0.76);white-space:nowrap;transition:color .2s}
 .cnode:hover .ctxt{color:var(--cyan)}
-.carr{width:54px;height:1px;background:linear-gradient(90deg,rgba(0,184,217,0.72),rgba(0,184,217,0.12));flex-shrink:0;margin-top:6.5px;position:relative}
+.carr{width:42px;height:1px;background:linear-gradient(90deg,rgba(0,184,217,0.72),rgba(0,184,217,0.12));flex-shrink:0;margin-top:6.5px;position:relative}
 .carr::after{content:'';position:absolute;right:-1px;top:-4px;border:4px solid transparent;border-left:7px solid rgba(0,184,217,0.55)}
 .chain-caption{margin:34px auto 0;font-size:19px;color:rgba(205,218,232,0.90);max-width:940px;line-height:1.7;letter-spacing:0.005em;text-align:center}
 .chain-caption strong{color:rgba(235,245,255,0.88);font-weight:500}
@@ -236,7 +236,7 @@ body.details-page .reveal{opacity:1;transform:none}
 
 <script>
 // ── Pipeline ─────────────────────────────────────────────────────────────────
-const steps=['Prospect','Contact','MQL','TQL','Quote','Purchase Order','Production','Shipment','Invoice','Collect'];
+const steps=['Prospect','MQL','Quote','PO','Work Order','Shipment','Invoice','Collections'];
 const cc=document.getElementById('chain');
 steps.forEach((s,i)=>{
   const n=document.createElement('div');n.className='cnode';
