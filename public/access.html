@@ -125,6 +125,13 @@ body.details-page footer{padding-bottom:clamp(280px,36vh,420px)}
 .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1)}
 .reveal.in{opacity:1;transform:translateY(0)}
 body.details-page .reveal{opacity:1;transform:none}
+body.access-page .hero,
+body.access-page .divider,
+body.access-page .pipeline-wrap,
+body.access-page .modules-wrap{display:none}
+body.access-page .cta-wrap{padding:118px 56px 120px;min-height:calc(100vh - 120px);display:flex;align-items:center;scroll-margin-top:0}
+body.access-page .cta-inner{width:100%}
+body.access-page footer{padding-bottom:32px}
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}#orrery-canvas{filter:none}}
 @media(max-width:900px){
   nav{padding:0 20px}
@@ -152,6 +159,10 @@ body.details-page .reveal{opacity:1;transform:none}
   .btn-p{width:100%;max-width:240px;text-align:center;padding:12px 18px}
   .mgrid{grid-template-columns:1fr}
   .cta-inner{padding:42px 24px}
+  body.access-page .cta-wrap{padding:92px 24px 84px;min-height:auto}
+  body.access-page .cta-inner{padding:40px 24px;overflow:visible}
+  body.access-page .aform{min-width:0;width:100%;max-width:none}
+  body.access-page .cta-left p{max-width:none}
   .pipeline-wrap{padding-top:64px}
   .chain{padding:24px 18px}
   .cnode{min-width:90px}
@@ -160,7 +171,7 @@ body.details-page .reveal{opacity:1;transform:none}
 }
 </style>
 </head>
-<body class="details-page">
+<body class="details-page access-page">
 
 <nav>
   <a href="#" class="nl">
@@ -184,7 +195,7 @@ body.details-page .reveal{opacity:1;transform:none}
   <h1>Your Industry<em>Your Universe</em></h1>
   <canvas id="orrery-canvas"></canvas>
   <p class="sub">The world's first <strong>end-to-end revenue operating system</strong> built exclusively for B2B manufacturers — from first prospect to collected payment, without switching tools.</p>
-  <div class="hcta"><a href="access.html" class="btn-p">Request Early Access</a></div>
+  <div class="hcta"><a href="#access" class="btn-p">Request Early Access</a></div>
 </section>
 
 <div class="divider"></div>
