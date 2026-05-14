@@ -95,7 +95,8 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 .mdesc{font-size:16px;color:rgba(190,205,220,0.76);line-height:1.65}
 
 /* CTA */
-.cta-wrap{padding:0 56px 100px}
+.access-anchor{display:block;position:relative;top:-72px;visibility:hidden}
+.cta-wrap{padding:0 56px 100px;scroll-margin-top:84px}
 .cta-inner{border:1px solid var(--border);padding:64px 72px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:48px;position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(0,184,217,0.04) 0%,rgba(7,16,28,0.82) 58%,transparent 100%)}
 .cta-inner::before{content:'';position:absolute;top:-80px;left:0;width:300px;height:300px;background:radial-gradient(ellipse,rgba(0,184,217,0.04) 0%,transparent 70%)}
 .cta-left h2{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,2.8vw,42px);font-weight:700;letter-spacing:0.02em;color:#fff;margin-bottom:12px;line-height:1}
@@ -109,6 +110,7 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 .anote{font-size:14px;color:rgba(190,205,220,0.76);letter-spacing:0.035em;text-align:center}
 
 footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+body.details-page footer{padding-bottom:clamp(280px,36vh,420px)}
 .fb{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
 .fb span{color:var(--cyan)}
 .fr{font-size:13px;color:var(--muted);letter-spacing:0.05em}
@@ -202,7 +204,8 @@ body.details-page .reveal{opacity:1;transform:none}
   <div class="mgrid" id="mgrid"></div>
 </section>
 
-<section class="cta-wrap reveal" id="access">
+<span id="access" class="access-anchor" aria-hidden="true"></span>
+<section class="cta-wrap reveal">
   <div class="cta-inner">
     <div class="cta-left">
       <h2>Join the First Wave.</h2>
