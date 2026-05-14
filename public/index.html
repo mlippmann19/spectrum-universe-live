@@ -15,14 +15,14 @@ html{scroll-behavior:smooth;text-size-adjust:100%;-webkit-text-size-adjust:100%}
 body{font-family:'Inter',system-ui,sans-serif;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(0,184,217,0.06),transparent 55%),var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased;line-height:1.6}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(3,7,17,0.82);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.nl{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
-.nl svg{width:26px;height:26px}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 48px;background:rgba(3,7,17,0.82);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nl{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+.nl svg{width:30px;height:30px}
 .nl span{color:var(--cyan)}
 .nr{display:flex;align-items:center;gap:20px}
-.nlink{font-size:13px;font-weight:500;letter-spacing:0.095em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.nlink{font-size:16px;font-weight:600;letter-spacing:0.085em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
 .nlink:hover{color:var(--text)}
-.nbtn{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;padding:9px 24px;border:1px solid rgba(110,231,249,0.5);background:rgba(0,184,217,0.03);color:var(--cyan-soft);cursor:pointer;text-decoration:none;transition:background .2s,color .2s,border-color .2s;display:inline-block}
+.nbtn{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:11px 28px;border:1px solid rgba(110,231,249,0.5);background:rgba(0,184,217,0.03);color:var(--cyan-soft);cursor:pointer;text-decoration:none;transition:background .2s,color .2s,border-color .2s;display:inline-block}
 .nbtn:hover{background:var(--cyan);color:#000}
 
 /* HERO — everything tight, fits one screen */
@@ -131,12 +131,12 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   .modules-head p{text-align:left}
 }
 @media(max-width:560px){
-  nav{height:58px;padding:0 12px}
-  .nl{font-size:15px;letter-spacing:.13em;gap:8px}
-  .nl svg{width:24px;height:24px}
+  nav{height:64px;padding:0 12px}
+  .nl{font-size:17px;letter-spacing:.11em;gap:8px}
+  .nl svg{width:27px;height:27px}
   .nr{gap:10px}
   .nlink{display:none}
-  .nbtn{font-size:12px;letter-spacing:.10em;padding:8px 15px;line-height:1.05;text-align:center}
+  .nbtn{font-size:14px;letter-spacing:.085em;padding:9px 16px;line-height:1.05;text-align:center}
   .hero{padding:82px 20px 28px;justify-content:flex-start;gap:7px}
   .eyebrow{font-size:11px;letter-spacing:.17em;margin-top:68px}
   .eyebrow::before,.eyebrow::after{width:26px}
