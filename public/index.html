@@ -418,7 +418,8 @@ window.addEventListener('scroll',()=>{
     let y1=y*Math.cos(tX), z1=y*Math.sin(tX), x1=x;
     let x2=x1*Math.cos(tY)+z1*Math.sin(tY), z2=-x1*Math.sin(tY)+z1*Math.cos(tY), y2=y1;
     const P=S*1.05, sc=P/(P+z2+S*.42);
-    return{px:ORIGIN_X+x2*sc, py:ORIGIN_Y+y2*sc, z:z2, sc};
+    const wide = window.innerWidth < 560 ? 1.06 : 1.46;
+    return{px:ORIGIN_X+x2*sc*wide, py:ORIGIN_Y+y2*sc, z:z2, sc};
   }
 
   function drawRing(r,tx,ty,alpha){
