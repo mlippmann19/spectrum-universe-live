@@ -24,6 +24,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:68px;display:flex;ali
 .nlink:hover{color:var(--text)}
 .nbtn{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:11px 28px;border:1px solid rgba(110,231,249,0.5);background:rgba(0,184,217,0.03);color:var(--cyan-soft);cursor:pointer;text-decoration:none;transition:background .2s,color .2s,border-color .2s;display:inline-block}
 .nbtn:hover{background:var(--cyan);color:#000}
+.nbtn.demo{border-color:rgba(220,245,255,0.22);color:rgba(220,245,255,0.74)}
+.nbtn.demo:hover{border-color:var(--cyan);color:#001018}
 
 /* HERO — everything tight, fits one screen */
 .hero{
@@ -56,6 +58,8 @@ h1 em{font-style:normal;display:block;color:var(--cyan)}
 .hcta{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px}
 .btn-p{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;padding:13px 38px;border:1px solid rgba(110,231,249,0.35);background:var(--cyan);color:#001018;cursor:pointer;text-decoration:none;display:inline-block;transition:opacity .2s,transform .15s,box-shadow .2s;box-shadow:0 0 0 1px rgba(0,184,217,0.08),0 14px 42px rgba(0,184,217,0.14)}
 .btn-p:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 0 0 1px rgba(0,184,217,0.18),0 18px 48px rgba(0,184,217,0.2)}
+.btn-s{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;padding:13px 34px;border:1px solid rgba(220,245,255,0.22);background:rgba(3,7,17,0.28);color:rgba(235,245,255,0.82);cursor:pointer;text-decoration:none;display:inline-block;transition:color .2s,border-color .2s,transform .15s}
+.btn-s:hover{color:var(--cyan-soft);border-color:rgba(110,231,249,0.58);transform:translateY(-1px)}
 
 /* DIVIDER */
 .divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan) 50%,transparent);opacity:.1}
@@ -144,6 +148,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   .sub{font-size:16px;line-height:1.65;margin-top:0}
   .hcta{margin-top:12px}
   .btn-p{width:100%;max-width:240px;text-align:center;padding:12px 18px}
+  .btn-s{width:100%;max-width:240px;text-align:center;padding:12px 18px}
   .mgrid{grid-template-columns:1fr}
   .cta-inner{padding:42px 24px}
   .pipeline-wrap{padding-top:72px}
@@ -168,6 +173,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   </a>
   <div class="nr">
     <a href="mailto:info@spectrumdadvanced.com" class="nlink">Contact</a>
+    <a href="https://universe.spectrumadvanced.com" target="_blank" rel="noopener noreferrer" class="nbtn demo">See Demo</a>
     <a href="access.html" class="nbtn">Early Access</a>
   </div>
 </nav>
@@ -178,7 +184,7 @@ footer{border-top:1px solid var(--border);padding:24px 56px;display:flex;align-i
   <h1>Your Industry<em>Your Universe</em></h1>
   <canvas id="orrery-canvas"></canvas>
   <p class="sub">The world's first <strong>end-to-end revenue operating system</strong> built exclusively for B2B manufacturers — from first prospect to collected payment, without switching tools.</p>
-  <div class="hcta"><a href="access.html" class="btn-p">Request Early Access</a></div>
+  <div class="hcta"><a href="access.html" class="btn-p">Request Early Access</a><a href="https://universe.spectrumadvanced.com" target="_blank" rel="noopener noreferrer" class="btn-s">See Demo</a></div>
 </section>
 
 <div class="divider"></div>
