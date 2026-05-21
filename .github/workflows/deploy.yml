@@ -18,6 +18,29 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name=universecrm-landing --branch=main
 
+  deploy-crm-app:
+    runs-on: ubuntu-latest
+    name: Deploy CRM App to spectrum-universe
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build deploy directory
+        run: |
+          mkdir -p _deploy
+          cp index.html _deploy/
+          cp -r assets _deploy/
+          cp favicon.png _deploy/ 2>/dev/null || true
+          cp spectrum-logo.png _deploy/ 2>/dev/null || true
+          cp div-*.png _deploy/ 2>/dev/null || true
+          cp logo-*.jpg _deploy/ 2>/dev/null || true
+
+      - name: Deploy CRM to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy _deploy --project-name=spectrum-universe --branch=main
+
   deploy-supabase-functions:
     runs-on: ubuntu-latest
     name: Deploy Supabase Edge Functions
