@@ -34,6 +34,7 @@ jobs:
           mkdir -p _deploy
           cp index.html _deploy/
           cp -r assets _deploy/
+          cp -r functions _deploy/ 2>/dev/null || true
           cp favicon.png _deploy/ 2>/dev/null || true
           cp spectrum-logo.png _deploy/ 2>/dev/null || true
           cp div-*.png _deploy/ 2>/dev/null || true
