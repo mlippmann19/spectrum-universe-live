@@ -158,6 +158,19 @@ const FORM_TYPE_ROUTES: Record<string, RouteConfig> = {
     contactStatus: "lead",
     tag: "roll_details",
   },
+  // Schedule-a-call intent = high intent, treat same as mql_qualified
+  schedule_call_intent: {
+    dealStage: "mql",
+    companyStatus: "qualifying",
+    contactStatus: "lead",
+    tag: "schedule_call",
+  },
+  // Generic contact form with specs = qualifying
+  contact: {
+    dealStage: "prospect",
+    companyStatus: "prospect",
+    contactStatus: "lead",
+  },
 };
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
@@ -169,10 +182,11 @@ function computeScore(payload: WebsiteLeadPayload): number {
   switch (payload.form_type_detail) {
     case "quote_request":      score += 40; break;
     case "site_visit":         score += 30; break;
-    case "mql_qualified":      score += 25; break;
-    case "roll_details":       score += 20; break;
-    case "training":           score += 15; break;
-    case "unqualified_inquiry": score += 0; break;
+    case "mql_qualified":        score += 25; break;
+    case "schedule_call_intent":  score += 30; break;
+    case "roll_details":          score += 20; break;
+    case "training":              score += 15; break;
+    case "unqualified_inquiry":   score += 0; break;
   }
 
   // Work email bonus (+10)
@@ -511,14 +525,8 @@ async function createDeal(
     is_new_lead: true,
     lead_source: "website_intake",
     notes: fullNotes,
-
-    // Structured qual columns (mapped from payload)
-    primary_pain_type:   payload.qual_issue_type ?? null,
-    application_context: payload.qual_process_type ?? null,
-    problem_statement:   payload.spec_failure_description ?? null,
-    likely_division:     division,
-    segment:             payload.industry_segment ?? payload.segment ?? null,
-    industry_segment:    payload.industry_segment ?? payload.segment ?? null,
+    // All qual/spec data is serialized inside fullNotes (---QUAL_DATA--- block)
+    // No extra columns needed — the deals table schema is lean
   };
 
   // Store score — the deals table uses notes for this (no native score column
