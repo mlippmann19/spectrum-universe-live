@@ -18,6 +18,19 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy public --project-name=universecrm-landing --branch=main
 
+  deploy-crm-app:
+    runs-on: ubuntu-latest
+    name: Deploy CRM App (spectrum-universe)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy CRM to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=spectrum-universe --branch=main --commit-dirty=true
+
   deploy-supabase-functions:
     runs-on: ubuntu-latest
     name: Deploy Supabase Edge Functions
