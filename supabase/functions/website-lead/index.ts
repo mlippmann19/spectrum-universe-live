@@ -65,9 +65,9 @@ Deno.serve(async (req) => {
     }
 
     // ── Build the web_inquiry record ──────────────────────────────────────────
-    const firstName = payload.first_name ?? (payload.full_name ?? "").split(" ")[0] ?? "";
-    const lastName  = payload.last_name  ?? (payload.full_name ?? "").split(" ").slice(1).join(" ") ?? "";
-    const fullName  = payload.full_name  ?? [firstName, lastName].filter(Boolean).join(" ") || payload.name;
+    const firstName = payload.first_name || ((payload.full_name || "").split(" ")[0] || "");
+    const lastName  = payload.last_name  || ((payload.full_name || "").split(" ").slice(1).join(" ") || "");
+    const fullName  = payload.full_name  || ([firstName, lastName].filter(Boolean).join(" ") || payload.name || "");
 
     const record: Record<string, unknown> = {
       submitted_at:       new Date().toISOString(),
