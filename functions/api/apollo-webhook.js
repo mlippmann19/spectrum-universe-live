@@ -5,9 +5,10 @@
  */
 
 const SUPABASE_URL = "https://tplkmtmuoyslmjewcudk.supabase.co";
-const SUPABASE_KEY = "sb_publishable_0zCOvDy91vkLrXrxf8m4aA_jPM_TJVa";
 
 export async function onRequestPost(context) {
+  // Secret key required to bypass RLS on contacts PATCH — set as CF Pages env var SUPABASE_SECRET_KEY
+  const SUPABASE_KEY = context.env?.SUPABASE_SECRET_KEY;
   try {
     const payload = await context.request.json();
 
