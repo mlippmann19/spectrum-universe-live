@@ -18,11 +18,14 @@ export async function onRequestPost(context) {
       ? `${WEBHOOK_BASE}?contact_id=${encodeURIComponent(contact_id)}`
       : WEBHOOK_BASE;
 
+    // run_waterfall_phone checks Apollo + 3rd-party sources (much broader coverage)
+    // reveal_phone_number only uses Apollo's own phone credits (limited plan)
     const body = apollo_id
       ? {
           id: apollo_id,
           reveal_personal_emails: true,
           reveal_phone_number: true,
+          run_waterfall_phone: true,
           webhook_url: webhookUrl,
         }
       : {
@@ -32,6 +35,7 @@ export async function onRequestPost(context) {
           title,
           reveal_personal_emails: true,
           reveal_phone_number: true,
+          run_waterfall_phone: true,
           webhook_url: webhookUrl,
         };
 
