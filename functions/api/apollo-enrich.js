@@ -1,11 +1,11 @@
 /**
  * Apollo person enrichment proxy
  *
- * Strategy:
- * 1. Call people/match to get email + person data
- * 2. If phone not returned, call contacts/search — this returns already-revealed
- *    phones from your account synchronously with no extra credit cost
- * 3. If still no phone, fire waterfall webhook as last-resort async fallback
+ * Phone strategy (in order):
+ * 1. contacts/search  — returns already-revealed phones instantly, zero credits
+ * 2. people/match with reveal_phone_number + webhook_url — same as "Access Mobile"
+ *    in Apollo UI, costs 8 credits, fires webhook async (~5-15s)
+ * 3. If phone found in step 1, write to Supabase immediately (no wait needed)
  */
 
 const APOLLO_API_KEY = "mrP_gnR6DZoiJfGAr8A72w";
@@ -19,7 +19,7 @@ export async function onRequestPost(context) {
 
     const SUPABASE_KEY = context.env?.SUPABASE_SECRET_KEY;
 
-    // ── Step 1: people/match for email + identity ──────────────────────────
+    // ── Step 1: people/match — get identity + email ────────────────────────
     const matchBody = apollo_id
       ? { id: apollo_id, reveal_personal_emails: true }
       : { first_name, last_name, organization_domain: domain, title, reveal_personal_emails: true };
@@ -29,10 +29,11 @@ export async function onRequestPost(context) {
       headers: { "x-api-key": APOLLO_API_KEY, "Content-Type": "application/json", "Cache-Control": "no-cache" },
       body: JSON.stringify(matchBody),
     });
-    const matchData = await matchResp.json();
-    const person = matchData?.person ?? null;
+    const matchData  = await matchResp.json();
+    const person     = matchData?.person ?? null;
+    const resolvedId = person?.id ?? apollo_id ?? null;
 
-    // Extract email from match
+    // Extract email
     let email = null;
     if (person) {
       const rawEmail = person.email;
@@ -42,11 +43,9 @@ export async function onRequestPost(context) {
       }
     }
 
-    // ── Step 2: contacts/search for already-revealed phone (free, sync) ────
+    // ── Step 2: contacts/search — already-revealed phones, free & instant ──
     let phone = null;
-    const searchName = [first_name, last_name].filter(Boolean).join(" ").trim()
-      || person?.name
-      || "";
+    const searchName = [first_name, last_name].filter(Boolean).join(" ").trim() || person?.name || "";
 
     if (searchName) {
       try {
@@ -56,10 +55,7 @@ export async function onRequestPost(context) {
           body: JSON.stringify({ q_keywords: searchName, page: 1, per_page: 5 }),
         });
         const searchData = await searchResp.json();
-        const contacts = searchData?.contacts ?? [];
-
-        // Find the best match — prefer mobile number
-        for (const c of contacts) {
+        for (const c of (searchData?.contacts ?? [])) {
           const phones = c.phone_numbers ?? [];
           const mobile = phones.find(p => p?.type === "mobile" && p?.sanitized_number);
           const any    = phones.find(p => p?.sanitized_number);
@@ -69,26 +65,41 @@ export async function onRequestPost(context) {
       } catch { /* non-fatal */ }
     }
 
-    // ── Step 3: if still no phone, fire waterfall webhook (async, costs credits) ──
-    let webhookRegistered = false;
-    if (!phone && contact_id) {
+    // ── Step 3: if still no phone, fire reveal_phone_number (= "Access Mobile") ──
+    // This costs 8 Apollo credits and sends the result async via webhook
+    let webhookFired = false;
+    if (!phone && contact_id && resolvedId) {
       try {
         const webhookUrl = `${WEBHOOK_BASE}?contact_id=${encodeURIComponent(contact_id)}`;
         await fetch("https://api.apollo.io/api/v1/people/match", {
           method: "POST",
           headers: { "x-api-key": APOLLO_API_KEY, "Content-Type": "application/json", "Cache-Control": "no-cache" },
           body: JSON.stringify({
-            ...(apollo_id ? { id: apollo_id } : { first_name, last_name, organization_domain: domain, title }),
+            id: resolvedId,
             reveal_phone_number: true,
-            run_waterfall_phone: true,
             webhook_url: webhookUrl,
           }),
         });
-        webhookRegistered = true;
+        webhookFired = true;
+      } catch { /* non-fatal */ }
+    } else if (!phone && contact_id && !resolvedId) {
+      // No Apollo ID yet — use name+domain match with webhook
+      try {
+        const webhookUrl = `${WEBHOOK_BASE}?contact_id=${encodeURIComponent(contact_id)}`;
+        await fetch("https://api.apollo.io/api/v1/people/match", {
+          method: "POST",
+          headers: { "x-api-key": APOLLO_API_KEY, "Content-Type": "application/json", "Cache-Control": "no-cache" },
+          body: JSON.stringify({
+            first_name, last_name, organization_domain: domain, title,
+            reveal_phone_number: true,
+            webhook_url: webhookUrl,
+          }),
+        });
+        webhookFired = true;
       } catch { /* non-fatal */ }
     }
 
-    // ── Step 4: if we got a phone synchronously, write it to DB now ────────
+    // ── Step 4: if phone found synchronously, write to Supabase now ────────
     if (phone && contact_id && SUPABASE_KEY) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/contacts?id=eq.${encodeURIComponent(contact_id)}`, {
@@ -108,7 +119,7 @@ export async function onRequestPost(context) {
       JSON.stringify({
         ...matchData,
         _phone_sync: phone,
-        _webhook_registered: webhookRegistered,
+        _webhook_fired: webhookFired,
         _contact_id: contact_id ?? null,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
