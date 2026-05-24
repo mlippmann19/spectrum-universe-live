@@ -1,7 +1,7 @@
 /**
  * Apollo people search proxy
  * Searches for contacts at a company by domain or company name
- * Uses mixed_people/search (the correct endpoint for people database search)
+ * Uses mixed_people/api_search (the correct endpoint for people database search)
  */
 
 const APOLLO_API_KEY = "mrP_gnR6DZoiJfGAr8A72w";
@@ -44,7 +44,7 @@ export async function onRequestPost(context) {
       searchPayload.person_locations = [location];
     }
 
-    const response = await fetch("https://api.apollo.io/api/v1/mixed_people/search", {
+    const response = await fetch("https://api.apollo.io/api/v1/mixed_people/api_search", {
       method: "POST",
       headers: {
         "x-api-key": APOLLO_API_KEY,
@@ -58,7 +58,7 @@ export async function onRequestPost(context) {
 
     // If domain search returns nothing, try company name search as fallback
     if (domain && (!data.people || data.people.length === 0) && company_name) {
-      const fallback = await fetch("https://api.apollo.io/api/v1/mixed_people/search", {
+      const fallback = await fetch("https://api.apollo.io/api/v1/mixed_people/api_search", {
         method: "POST",
         headers: {
           "x-api-key": APOLLO_API_KEY,
