@@ -39,11 +39,6 @@ export async function onRequestPost(context) {
       searchPayload.q_organization_name = company_name;
     }
 
-    // Add location filter if provided (city/state)
-    if (location) {
-      searchPayload.person_locations = [location];
-    }
-
     const response = await fetch("https://api.apollo.io/api/v1/mixed_people/api_search", {
       method: "POST",
       headers: {
@@ -70,8 +65,7 @@ export async function onRequestPost(context) {
           person_titles: ICP_TITLES,
           per_page: 20,
           page: 1,
-          ...(location ? { person_locations: [location] } : {}),
-        }),
+            }),
       });
       const fallbackData = await fallback.json();
       if (fallbackData.people?.length > 0) {
